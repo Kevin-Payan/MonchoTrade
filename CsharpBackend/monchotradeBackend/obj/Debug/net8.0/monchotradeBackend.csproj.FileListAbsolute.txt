@@ -133,3 +133,7 @@ C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Deb
 C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug\net8.0\monchotradeBackend.pdb
 C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug\net8.0\monchotradeBackend.genruntimeconfig.cache
 C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug\net8.0\ref\monchotradeBackend.dll
+C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\fvelazquez\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
