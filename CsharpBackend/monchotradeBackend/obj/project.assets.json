@@ -3137,30 +3137,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\fvelazquez\\.nuget\\packages\\": {}
+    "C:\\Users\\Fernando\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\fvelazquez\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
+      "projectUniqueName": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
       "projectName": "monchotradeBackend",
-      "projectPath": "c:\\Users\\fvelazquez\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
-      "packagesPath": "C:\\Users\\fvelazquez\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\fvelazquez\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\obj\\",
+      "projectPath": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
+      "packagesPath": "C:\\Users\\Fernando\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\fvelazquez\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Fernando\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\DevExpress 20.2\\DevExtreme\\System\\DevExtreme\\Bin\\AspNet": {},
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nuget.devexpress.com/api": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
@@ -3235,7 +3230,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
