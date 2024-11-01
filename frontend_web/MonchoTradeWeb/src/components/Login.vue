@@ -1,14 +1,50 @@
 <script setup>
-// Here you can set up any necessary logic for the form
+import { ref } from 'vue';
+import axios from 'axios';
+import { appsettings } from '../../settings/appsettings';
+import { useRouter } from 'vue-router';
+const email = ref('');
+const password = ref('');
+const errorMessage = ref('');
+const router = useRouter(); // Instantiate router
+
+const axiosConfig = {
+    headers: {
+        'Content-Type': 'application/json',
+    }
+};
+
+    const handleSubmit = async () => {
+        errorMessage.value = '';
+        try {
+            const response = await axios.post(
+                `${appsettings.apiUrl}${appsettings.sessionRoute}/login`,
+                {
+                    email: email.value,
+                    password: password.value,
+                },
+                axiosConfig
+            );
+            console.log('Login successful:', response.data);
+            router.push('/'); // Adjust this route as needed
+        } catch (error) {
+            if (error.response) {
+                errorMessage.value = error.response.data || 'Login failed. Please try again.';
+            } else {
+                errorMessage.value = 'No response from server.';
+            }
+        }
+    };
 </script>
+
 
 <template>
     <form @submit.prevent="handleSubmit">
         <label for="email">Email</label><br>
-        <input id="email" type="email" placeholder="m@example.com" required><br>
+        <input id="email" type="email"  v-model="email" placeholder="m@example.com" required><br>
         
         <label for="password">Password</label><br>
-        <input id="password" type="password" placeholder="Enter your password" required><br>
+        <input id="password" type="password"  v-model="password" placeholder="Enter your password" required><br>
 
         <button type="submit">Login</button>
     </form>
