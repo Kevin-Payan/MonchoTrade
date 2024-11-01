@@ -2,17 +2,57 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo">MonchoTrade</div>
-            <ul class="nav-links">
+            
+            <ul :class="{ 'show': isMobileMenuOpen }" class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-            <div class="menu-toggle" @click="toggleMenu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+
+            <!-- Profile Section -->
+            <div class="relative">
+                <button 
+                    @click="toggleProfileMenu"
+                    @blur="handleBlur"
+                    class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <img 
+                        :src=profileImage.value
+                        alt="User Profile" 
+                        class="w-full h-full object-cover"
+                    >
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div 
+                    v-show="isProfileMenuOpen"
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1"
+                >
+                    <a 
+                        href="/settings" 
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+                    >
+                        Settings
+                    </a>
+                    <a 
+                        href="/logout" 
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+                    >
+                        Logout
+                    </a>
+                </div>
             </div>
+
+            <button 
+                class="menu-toggle" 
+                @click="toggleMobileMenu"
+                aria-label="Toggle navigation menu"
+            >
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
         </div>
     </nav>
 </template>
@@ -20,28 +60,46 @@
 <script setup>
 import { ref } from 'vue';
 
-const isMenuOpen = ref(false);
+const isProfileMenuOpen = ref(false);
+const isMobileMenuOpen = ref(false);
+const profileImage = ref('/assets/profile1.jpg');
 
-const toggleMenu = () => {
-    isMenuOpen.value = !isMenuOpen.value;
+const toggleProfileMenu = () => {
+    isProfileMenuOpen.value = !isProfileMenuOpen.value;
+};
+
+const toggleMobileMenu = () => {
+    isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+// Handle blur event with slight delay to allow for click events on menu items
+const handleBlur = (event) => {
+    setTimeout(() => {
+        if (!event.relatedTarget?.closest('.dropdown-menu')) {
+            isProfileMenuOpen.value = false;
+        }
+    }, 100);
 };
 </script>
 
-<style>
+<style scoped>
 .navbar {
     background-color: #333;
     color: white;
-    padding: 10px 20px;
+    padding: 0.75rem 1.25rem;
+    position: relative;
 }
 
 .navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
@@ -50,45 +108,49 @@ const toggleMenu = () => {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.nav-links li {
-    margin: 0 15px;
+    gap: 2rem;
 }
 
 .nav-links a {
     color: white;
     text-decoration: none;
     font-weight: 500;
+    transition: color 0.2s;
 }
 
 .nav-links a:hover {
-    text-decoration: underline;
+    color: #e2e2e2;
 }
 
 .menu-toggle {
     display: none;
     flex-direction: column;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 1rem;
     cursor: pointer;
 }
 
 .menu-toggle .bar {
-    height: 3px;
-    width: 25px;
+    height: 2px;
+    width: 24px;
     background-color: white;
-    margin: 4px 0;
+    margin: 3px 0;
+    transition: 0.3s;
 }
 
-/* Responsive Styles */
 @media (max-width: 768px) {
     .nav-links {
         display: none;
         flex-direction: column;
         position: absolute;
-        top: 60px; /* Adjust according to your navbar height */
+        top: 100%;
         left: 0;
+        right: 0;
         background-color: #333;
-        width: 100%;
+        padding: 1rem;
+        gap: 1rem;
     }
 
     .nav-links.show {
