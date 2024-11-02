@@ -1,4 +1,5 @@
 <script setup>
+import { EnvelopeIcon } from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 import axios from "axios";
 import { appsettings } from "../../settings/appsettings";
@@ -63,7 +64,9 @@ const handleSubmit = async () => {
     </div>
     <button type="submit">Log in</button>
     <h2 class="text-center text-gray-500 text-xs p-3">OR CONTINUE WITH</h2>
-    <button class="google-button">Google</button>
+    <button class="google-button">
+      <EnvelopeIcon class="size-6 m-2" />Google
+    </button>
     <p class="text-sm flex justify-center p-2">
       Don't have an account?<span class="underline ml-1">Sign up</span>
     </p>
@@ -117,6 +120,9 @@ button {
 }
 
 .google-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 15px;
   padding: 4px 0px;
   width: 100%;
