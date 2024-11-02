@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("monchotradeBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+163f37bbd7d1da6ec0ec9381f4c4bc90fd82aa03")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f97a4a8d537cfaabc8d4812ba5a80c1e5155e9c2")]
 [assembly: System.Reflection.AssemblyProductAttribute("monchotradeBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("monchotradeBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
