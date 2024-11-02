@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using monchotradebackend.data;
 
@@ -15,43 +16,583 @@ namespace monchotradeBackend.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("monchotradebackend.models.entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Products", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6324),
+                            Description = "Classic blue jeans for everyday wear",
+                            IsActive = true,
+                            Name = "Men's Jeans",
+                            Quantity = 10,
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6329),
+                            Description = "Comfortable cotton t-shirt, perfect for casual outings",
+                            IsActive = true,
+                            Name = "Casual T-Shirt",
+                            Quantity = 5,
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6379),
+                            Description = "Noise-cancelling headphones with high-quality sound",
+                            IsActive = true,
+                            Name = "Wireless Headphones",
+                            Quantity = 8,
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6390),
+                            Description = "Portable speaker with long battery life",
+                            IsActive = true,
+                            Name = "Bluetooth Speaker",
+                            Quantity = 12,
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Category = "Footwear",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6395),
+                            Description = "Comfortable and durable sports shoes",
+                            IsActive = true,
+                            Name = "Sports Sneakers",
+                            Quantity = 7,
+                            UserId = 3
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Category = "Footwear",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6405),
+                            Description = "Lightweight running shoes for everyday exercise",
+                            IsActive = true,
+                            Name = "Running Shoes",
+                            Quantity = 10,
+                            UserId = 3
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Category = "Accessories",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6410),
+                            Description = "Fast-charging USB-C charger",
+                            IsActive = true,
+                            Name = "Smartphone Charger",
+                            Quantity = 15,
+                            UserId = 4
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Category = "Accessories",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6428),
+                            Description = "10,000mAh power bank for mobile devices",
+                            IsActive = true,
+                            Name = "Power Bank",
+                            Quantity = 9,
+                            UserId = 4
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6433),
+                            Description = "Stylish white formal shirt, perfect for office",
+                            IsActive = true,
+                            Name = "Formal Shirt",
+                            Quantity = 11,
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6437),
+                            Description = "Comfortable black dress pants for formal events",
+                            IsActive = true,
+                            Name = "Dress Pants",
+                            Quantity = 6,
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Category = "Office Supplies",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6442),
+                            Description = "Ergonomic stand for laptops",
+                            IsActive = true,
+                            Name = "Laptop Stand",
+                            Quantity = 8,
+                            UserId = 6
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Category = "Office Supplies",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6447),
+                            Description = "Compact wireless mouse for convenience",
+                            IsActive = true,
+                            Name = "Wireless Mouse",
+                            Quantity = 13,
+                            UserId = 6
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Category = "Accessories",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6451),
+                            Description = "Sporty digital watch with water resistance",
+                            IsActive = true,
+                            Name = "Digital Watch",
+                            Quantity = 14,
+                            UserId = 7
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Category = "Accessories",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6456),
+                            Description = "Tracks steps, calories, and more",
+                            IsActive = true,
+                            Name = "Fitness Tracker",
+                            Quantity = 5,
+                            UserId = 7
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6664),
+                            Description = "Stylish and warm winter jacket",
+                            IsActive = true,
+                            Name = "Men's Jacket",
+                            Quantity = 4,
+                            UserId = 8
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6704),
+                            Description = "Soft wool scarf for cold weather",
+                            IsActive = true,
+                            Name = "Wool Scarf",
+                            Quantity = 7,
+                            UserId = 8
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6708),
+                            Description = "10-inch tablet with high-resolution display",
+                            IsActive = true,
+                            Name = "Tablet",
+                            Quantity = 6,
+                            UserId = 9
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6712),
+                            Description = "Protective case for 10-inch tablet",
+                            IsActive = true,
+                            Name = "Tablet Case",
+                            Quantity = 10,
+                            UserId = 9
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Category = "Fitness",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6716),
+                            Description = "Non-slip yoga mat for workouts",
+                            IsActive = true,
+                            Name = "Yoga Mat",
+                            Quantity = 12,
+                            UserId = 10
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Category = "Fitness",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6720),
+                            Description = "Adjustable dumbbells for home workouts",
+                            IsActive = true,
+                            Name = "Dumbbells Set",
+                            Quantity = 3,
+                            UserId = 10
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Category = "Office Supplies",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6724),
+                            Description = "Keeps your desk neat and organized",
+                            IsActive = true,
+                            Name = "Desk Organizer",
+                            Quantity = 8,
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Category = "Office Supplies",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6728),
+                            Description = "Set of three notepads",
+                            IsActive = true,
+                            Name = "Notepad Set",
+                            Quantity = 15,
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Category = "Home Decor",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6732),
+                            Description = "Elegant ceramic vase for home decor",
+                            IsActive = true,
+                            Name = "Ceramic Vase",
+                            Quantity = 7,
+                            UserId = 12
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Category = "Home Decor",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6736),
+                            Description = "Soft pillow with a decorative cover",
+                            IsActive = true,
+                            Name = "Decorative Pillow",
+                            Quantity = 10,
+                            UserId = 12
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6740),
+                            Description = "High-precision gaming mouse",
+                            IsActive = true,
+                            Name = "Gaming Mouse",
+                            Quantity = 6,
+                            UserId = 13
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6744),
+                            Description = "Tactile mechanical keyboard",
+                            IsActive = true,
+                            Name = "Mechanical Keyboard",
+                            Quantity = 5,
+                            UserId = 13
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Category = "Home Decor",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6748),
+                            Description = "Modern abstract wall art",
+                            IsActive = true,
+                            Name = "Wall Art",
+                            Quantity = 4,
+                            UserId = 14
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Category = "Home Decor",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6757),
+                            Description = "Stylish table lamp with adjustable brightness",
+                            IsActive = true,
+                            Name = "Table Lamp",
+                            Quantity = 8,
+                            UserId = 14
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6761),
+                            Description = "Programmable smart thermostat",
+                            IsActive = true,
+                            Name = "Smart Thermostat",
+                            Quantity = 5,
+                            UserId = 15
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6765),
+                            Description = "Compact air purifier for small rooms",
+                            IsActive = true,
+                            Name = "Air Purifier",
+                            Quantity = 3,
+                            UserId = 15
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Category = "Accessories",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6770),
+                            Description = "Polarized sunglasses with UV protection",
+                            IsActive = true,
+                            Name = "Sunglasses",
+                            Quantity = 10,
+                            UserId = 16
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Category = "Accessories",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6774),
+                            Description = "Classic leather wallet with multiple compartments",
+                            IsActive = true,
+                            Name = "Leather Wallet",
+                            Quantity = 9,
+                            UserId = 16
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6778),
+                            Description = "Comfortable cotton hoodie",
+                            IsActive = true,
+                            Name = "Cotton Hoodie",
+                            Quantity = 8,
+                            UserId = 17
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6782),
+                            Description = "Adjustable sports cap",
+                            IsActive = true,
+                            Name = "Sports Cap",
+                            Quantity = 15,
+                            UserId = 17
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6786),
+                            Description = "Compact charger for mobile devices",
+                            IsActive = true,
+                            Name = "Portable Charger",
+                            Quantity = 14,
+                            UserId = 18
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Category = "Electronics",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6790),
+                            Description = "Set of 3 USB cables",
+                            IsActive = true,
+                            Name = "USB Cable Set",
+                            Quantity = 12,
+                            UserId = 18
+                        },
+                        new
+                        {
+                            Id = 37,
+                            Category = "Kitchen",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6794),
+                            Description = "Non-stick cookware set",
+                            IsActive = true,
+                            Name = "Cookware Set",
+                            Quantity = 6,
+                            UserId = 19
+                        },
+                        new
+                        {
+                            Id = 38,
+                            Category = "Kitchen",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6798),
+                            Description = "Stainless steel knives for every need",
+                            IsActive = true,
+                            Name = "Knife Set",
+                            Quantity = 7,
+                            UserId = 19
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6802),
+                            Description = "Comfortable everyday pants",
+                            IsActive = true,
+                            Name = "Pants",
+                            Quantity = 6,
+                            UserId = 20
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Category = "Clothing",
+                            CreatedAt = new DateTime(2024, 11, 2, 12, 35, 39, 373, DateTimeKind.Local).AddTicks(6806),
+                            Description = "Warm sweater for winter",
+                            IsActive = true,
+                            Name = "Sweater",
+                            Quantity = 15,
+                            UserId = 20
+                        });
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImages", (string)null);
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.ProfileImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProfileImages", (string)null);
+                });
 
             modelBuilder.Entity("monchotradebackend.models.entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateOnly>("BirthDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("date");
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecondLastName")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -66,7 +607,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "ana.martinezgomez@example.com",
                             LastName = "Martinez",
                             Name = "Ana Luisa",
-                            PasswordHash = "$2a$11$SfjI5GHM24/rxDcV3FqlMuHqM6fy//H7SLt8RfMvPSpaFPRiX4VkO",
+                            PasswordHash = "$2a$11$keFNqsZ2FFMnHMzwmg6Rku/Nn9pT7TVq/LztlRvxaFSAjEutfnkzi",
                             PhoneNumber = "+52 55 1234 5678",
                             SecondLastName = "Gomez"
                         },
@@ -78,7 +619,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "carlos.gomezlopez@example.com",
                             LastName = "Gomez",
                             Name = "Carlos",
-                            PasswordHash = "$2a$11$8LDB6DZ4SRaVMD/Z2/6dNueYhBmIQ9YfIt3c/hH9JQZUE2DiAWVdy",
+                            PasswordHash = "$2a$11$WxlNeBmFBcOaVI/iajaej.QBYvk1QmzxlBq1h/ytJYVlSXxTMAtT6",
                             PhoneNumber = "+52 33 9876 5432",
                             SecondLastName = "Lopez"
                         },
@@ -90,7 +631,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "miguel.torresramirez@example.com",
                             LastName = "Torres",
                             Name = "Miguel",
-                            PasswordHash = "$2a$11$UrAOcKu1bTH6dxDfc18nXeJKWVNWg7O0pgTxSdA0e7ENuwPzx5FDC",
+                            PasswordHash = "$2a$11$t5LphtCsYZIGyShbOH3YKOoTZwC8ggTqDpsn6dqdbc5RWIhG9Nml6",
                             PhoneNumber = "+52 81 5555 4444",
                             SecondLastName = "Ramirez"
                         },
@@ -102,7 +643,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "laura.rodriguezfernandez@example.com",
                             LastName = "Rodriguez",
                             Name = "Laura",
-                            PasswordHash = "$2a$11$5ZT4G8ta8Je3btkuAeVuFeVYv1CTHxJbU63xHhY5cWEfvVFK2c3.a",
+                            PasswordHash = "$2a$11$zPkDmz45DtaZ620BRu.73OiacFKuEYo.ssB1kZpyPRBAXYjEAzUZO",
                             PhoneNumber = "+52 55 2222 3333",
                             SecondLastName = "Fernandez"
                         },
@@ -114,7 +655,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "juan.sanchezmartinez@example.com",
                             LastName = "Sanchez",
                             Name = "Juan Carlos",
-                            PasswordHash = "$2a$11$J69vWRTZybJYAISsE7WFxO.cPmTlDFAuzGfK5CdtQL.a7620ipJKe",
+                            PasswordHash = "$2a$11$J6bICyoShMPY8/eZCTCajO12P.fdZClfL4jZK47AGFQVfjJyMBLKO",
                             PhoneNumber = "+52 33 7777 8888",
                             SecondLastName = "Martinez"
                         },
@@ -126,7 +667,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "sofia.ramirezcastillo@example.com",
                             LastName = "Ramirez",
                             Name = "Sofia",
-                            PasswordHash = "$2a$11$AfOWzmsh.m64y8gzpFtmwuEAt.s3mnUW/ITZ04GYxWcX.9ZJBSoFW",
+                            PasswordHash = "$2a$11$IwQVi6y85kzeTYm/RI0MHOHn/eyZj4Q4rcLpqvgIienEd3TJHJuti",
                             PhoneNumber = "+52 81 4444 5555",
                             SecondLastName = "Castillo"
                         },
@@ -138,7 +679,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "andres.lopezcastro@example.com",
                             LastName = "Lopez",
                             Name = "Andres",
-                            PasswordHash = "$2a$11$i9k5rm.0XGhyQ9A4ENN.X.cPD5hUKF2QYmhSlSKa0D5OGfz.RBLii",
+                            PasswordHash = "$2a$11$hOBKxqUHGhR3KjLccNQdM.9pQFm4RPhfY/tE32/zp78v4FMs64MzS",
                             PhoneNumber = "+52 55 6666 7777",
                             SecondLastName = "Castro"
                         },
@@ -150,7 +691,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "valentina.castroperez@example.com",
                             LastName = "Castro",
                             Name = "Valentina",
-                            PasswordHash = "$2a$11$qzflATPSOFU.M/0ko91/GOEqb2cEefV7vsp1BTUzdTbr9rOvqQfKS",
+                            PasswordHash = "$2a$11$emC98So.wHi2kKfRLaNESuJ5FoLWuheZO7DBgBCrvqzZJl0XZAZm6",
                             PhoneNumber = "+52 33 1111 2222",
                             SecondLastName = "Perez"
                         },
@@ -162,7 +703,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "pedro.jimenezmorales@example.com",
                             LastName = "Jimenez",
                             Name = "Pedro",
-                            PasswordHash = "$2a$11$Z//63u90J7KuF925iVGgJOrbigT6pBWVBkir70f95/ZLHx4HP8uL2",
+                            PasswordHash = "$2a$11$DD.UZQwOVdMRmupttLuQn.av8GcFHkRqXSmw2AbmITEIdkeOalwJW",
                             PhoneNumber = "+52 81 9999 0000",
                             SecondLastName = "Morales"
                         },
@@ -174,7 +715,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "mariana.diazherrera@example.com",
                             LastName = "Diaz",
                             Name = "Mariana",
-                            PasswordHash = "$2a$11$IpaIMWXRwuqEZsWVt7NYFe23y/0O7u/ywHxFr5mp5hR/Jx9uwZ8qe",
+                            PasswordHash = "$2a$11$1ZZlhc.Cjn4QPoC3mcEJ..3q/tds.0PaMUDGLyIFC75IpsE6t/X8S",
                             PhoneNumber = "+52 55 3333 4444",
                             SecondLastName = "Herrera"
                         },
@@ -186,7 +727,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "javier.moralesjimenez@example.com",
                             LastName = "Morales",
                             Name = "Javier",
-                            PasswordHash = "$2a$11$Kou1b5hBzhwrcTv8xpPevu4vxcYxmy0nLgczMO9A6/c/C7DoGjSCO",
+                            PasswordHash = "$2a$11$op1LlJr7V1FXtjgKuq1OguRAwet1rpOKI7a1M8DC7LilOXt/GUnDC",
                             PhoneNumber = "+52 33 5555 6666",
                             SecondLastName = "Jimenez"
                         },
@@ -198,7 +739,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "gabriela.fernandeztorres@example.com",
                             LastName = "Fernandez",
                             Name = "Gabriela",
-                            PasswordHash = "$2a$11$9FZOEbkaRPFigyWoG0Y1NelmNWwluBjoVZoiC1b3wdDGY8s9RbyJy",
+                            PasswordHash = "$2a$11$DvvB6KuutJEBQyUN37.YHeodW9eiugvAztQOrGGLmproleEf.1RFu",
                             PhoneNumber = "+52 81 2222 3333",
                             SecondLastName = "Torres"
                         },
@@ -210,7 +751,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "tomas.herreramendoza@example.com",
                             LastName = "Herrera",
                             Name = "Tomas",
-                            PasswordHash = "$2a$11$clPFPyV7UKnnrmqy5xUphOJ3XmleQN0beHjCd10SyfRiFkSvYaVTK",
+                            PasswordHash = "$2a$11$PzFG5Sn7xL8lyFeH.VhZMudZwxpEHlbaakLFm4KSx.x.zRnjRscPa",
                             PhoneNumber = "+52 55 7777 8888",
                             SecondLastName = "Mendoza"
                         },
@@ -222,7 +763,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "natalia.mendozarodriguez@example.com",
                             LastName = "Mendoza",
                             Name = "Natalia",
-                            PasswordHash = "$2a$11$SeIt78dborCj071Xbd.Zte4ctT5uMPl1MAbG0AnDWmPIRuVz5/Oai",
+                            PasswordHash = "$2a$11$bOW91KloFpT1G2Duds/ewOYLEZ.zvuNFln9ymQQ2cm1n/P6AvlfpK",
                             PhoneNumber = "+52 33 4444 5555",
                             SecondLastName = "Rodriguez"
                         },
@@ -234,7 +775,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "luis.ruizsanchez@example.com",
                             LastName = "Ruiz",
                             Name = "Luis Fernando",
-                            PasswordHash = "$2a$11$8txbI0wGPjT8lnFI9Uw/W.ApPra8tvPJpMtzqdkFunzIorpRq0pLK",
+                            PasswordHash = "$2a$11$oCl1A4w1jd4/QFjhtg0WaOGyKAGMn6QjIaIsczF86jH6RmR3VXvCW",
                             PhoneNumber = "+52 81 6666 7777",
                             SecondLastName = "Sanchez"
                         },
@@ -246,7 +787,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "elena.gonzalezreyes@example.com",
                             LastName = "Gonzalez",
                             Name = "Elena",
-                            PasswordHash = "$2a$11$aH.oHiQAaK5FRjslM51qRex3b7Pobf.F0Pc9LZ.4UDx/Jn4FMMjpS",
+                            PasswordHash = "$2a$11$8twugGYYG50YOudjuPYbZut2vk1ZVcAB13R.Il.6Rw.4ZfQxQT2xK",
                             PhoneNumber = "+52 55 8888 9999",
                             SecondLastName = "Reyes"
                         },
@@ -258,7 +799,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "ricardo.reyesgarcia@example.com",
                             LastName = "Reyes",
                             Name = "Ricardo",
-                            PasswordHash = "$2a$11$c6LQPb/C6GdUWIUs7Us4terHpE36NUY6WBONQFSv6PrIXOMCgk6za",
+                            PasswordHash = "$2a$11$Pphs2ZJ0PSeGHvUGQx3HJebVZthyBoAJB3kQq1XXp9flJe.SHt8ci",
                             PhoneNumber = "+52 33 0000 1111",
                             SecondLastName = "Garcia"
                         },
@@ -270,7 +811,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "isabel.garciamoreno@example.com",
                             LastName = "Garcia",
                             Name = "Isabel",
-                            PasswordHash = "$2a$11$cqyCEV0eGn5zkZ5OMjm/uu9tCw.SfuXmXjW8xHvDLuFbnlM.KHjXq",
+                            PasswordHash = "$2a$11$L3Yt58VFFtxhQmEYNEPmkO1SVc6qx77/bCPX8fp0QuOAW0Vfm2zNC",
                             PhoneNumber = "+52 81 3333 4444",
                             SecondLastName = "Moreno"
                         },
@@ -282,7 +823,7 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "daniel.morenosilva@example.com",
                             LastName = "Moreno",
                             Name = "Daniel",
-                            PasswordHash = "$2a$11$JwXbR7R/bCJyBj79wXgLyu2THNCqoAYpeIBdMc7.2TFbYDIE905xO",
+                            PasswordHash = "$2a$11$d.ebwuu7aPY0yh0IhKWRFO6jjDxHJ.NhElq5QWjMn0DF0bjRRCdue",
                             PhoneNumber = "+52 55 5555 6666",
                             SecondLastName = "Silva"
                         },
@@ -294,10 +835,53 @@ namespace monchotradeBackend.Data.Migrations
                             Email = "carmen.silvanavarro@example.com",
                             LastName = "Silva",
                             Name = "Carmen",
-                            PasswordHash = "$2a$11$iGMDATQMh5HadtqYQFJFbudnIAboGwjOOMqzgtjf3iY61BQbNpBPG",
+                            PasswordHash = "$2a$11$CWwc3Wjo4QmAmUdaIlUJFehtlh7NALAAQJrKPCdeR8XTxAZLY63Pq",
                             PhoneNumber = "+52 33 2222 3333",
                             SecondLastName = "Navarro"
                         });
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.Product", b =>
+                {
+                    b.HasOne("monchotradebackend.models.entities.User", "User")
+                        .WithMany("Products")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.ProductImage", b =>
+                {
+                    b.HasOne("monchotradebackend.models.entities.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.ProfileImage", b =>
+                {
+                    b.HasOne("monchotradebackend.models.entities.User", "User")
+                        .WithMany("Images")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.Product", b =>
+                {
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("monchotradebackend.models.entities.User", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

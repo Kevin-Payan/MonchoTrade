@@ -10,7 +10,7 @@ using authbackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("MonchoDb"); 
-builder.Services.AddDbContext<MonchoDbContext>(options => options.UseSqlite(connString)); //Ajustar para sqlite o sqlserver 
+builder.Services.AddDbContext<MonchoDbContext>(options => options.UseSqlServer(connString)); //Ajustar para sqlite o sqlserver 
 builder.Services.AddScoped<IPasswordHashingService, PasswordHashingService>();   //Asi se inicializa lo de los servicios
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddEndpointsApiExplorer(); 
