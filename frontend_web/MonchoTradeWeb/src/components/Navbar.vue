@@ -18,7 +18,7 @@
                     class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <img 
-                        :src=profileImage.value
+                        :src=profileImage
                         alt="User Profile" 
                         class="w-full h-full object-cover"
                     >
@@ -58,11 +58,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { appsettings } from "../../settings/appsettings";
 
 const isProfileMenuOpen = ref(false);
 const isMobileMenuOpen = ref(false);
-const profileImage = ref('/assets/profile1.jpg');
+const profileImage = ref('');
 
 const toggleProfileMenu = () => {
     isProfileMenuOpen.value = !isProfileMenuOpen.value;
@@ -71,6 +73,30 @@ const toggleProfileMenu = () => {
 const toggleMobileMenu = () => {
     isMobileMenuOpen.value = !isMobileMenuOpen.value;
 };
+
+const axiosConfig = {
+  headers: {
+    "Content-Type": "application/json",
+  },
+};
+
+const getProfileImage = async () => {
+
+    const storedId = parseInt(localStorage.getItem("userId"), 10);
+
+    try{
+        const response = await axios.get( `${appsettings.apiUrl}${appsettings.profileImageRoute}/user/${storedId}`,axiosConfig);
+        profileImage.value = appsettings.apiUrl + response.data;
+        console.log(profileImage.value)
+    }catch(error){
+        console.error("Error fetching profile image:", error); 
+    }
+};
+
+onMounted(() => {
+    getProfileImage(); 
+});
+
 
 // Handle blur event with slight delay to allow for click events on menu items
 const handleBlur = (event) => {

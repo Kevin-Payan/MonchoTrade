@@ -5,7 +5,7 @@ using monchotradebackend.models.dtos;
 using Microsoft.EntityFrameworkCore;
 using monchotradebackend.service;
 
-namespace authbackend.Controllers
+namespace monchotradebackend.controllers
 {
     [ApiController]
     [Route("profileimage")]
@@ -146,19 +146,19 @@ namespace authbackend.Controllers
             }
         }
 
-        [HttpGet("user/{email}")]
-        public async Task<IActionResult> GetProfileImageByEmail(string email)
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetProfileImageBy(int id)
         {
             try 
             {
                 var profiles = await _dbRepository.GetQueryable()
                     .Include(i => i.User)
-                    .Where(i => i.User.Email == email)
+                    .Where(i => i.User.Id == id)
                     .ToListAsync(); 
 
                 if (profiles == null || !profiles.Any())
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, $"Profile image with email: {email} not found");
+                    return StatusCode(StatusCodes.Status404NotFound, $"Profile image with userId: {id} not found");
                 }
 
                 var path = $"/uploads/profiles/{profiles[0].Url}";

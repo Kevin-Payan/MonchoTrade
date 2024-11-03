@@ -310,3 +310,4 @@ C:\Users\Fernando\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug
 C:\Users\Fernando\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug\net8.0\monchotradeBackend.pdb
 C:\Users\Fernando\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug\net8.0\monchotradeBackend.genruntimeconfig.cache
 C:\Users\Fernando\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\obj\Debug\net8.0\ref\monchotradeBackend.dll
+C:\Users\Fernando\Desktop\MonchoTrade\CsharpBackend\monchotradeBackend\bin\Debug\net8.0\monchotradeBackend.staticwebassets.runtime.json

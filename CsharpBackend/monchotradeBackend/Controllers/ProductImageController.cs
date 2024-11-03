@@ -5,7 +5,7 @@ using monchotradebackend.models.dtos;
 using Microsoft.EntityFrameworkCore;
 using monchotradebackend.service;
 
-namespace authbackend.Controllers
+namespace monchotradebackend.controllers
 {
     [ApiController]
     [Route("productimage")]

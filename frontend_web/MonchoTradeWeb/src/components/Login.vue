@@ -26,6 +26,14 @@ const handleSubmit = async () => {
       axiosConfig
     );
     console.log("Login successful:", response.data);
+
+    // Assuming the response data contains an id property
+    if (response.data.id) {
+      localStorage.setItem("userId", response.data.id.toString());
+    } else {
+      console.error("No user ID returned from server");
+    }
+
     router.push("/"); // Adjust this route as needed
   } catch (error) {
     if (error.response) {
