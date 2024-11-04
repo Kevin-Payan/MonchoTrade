@@ -30,6 +30,38 @@ namespace monchotradebackend.controllers
     }
     }
 
+    public class PaginationParameters
+    {
+        private const int MaxPageSize = 50;
+        private int _pageSize = 6;
+        private int _pageNumber = 1;
+
+        public int PageNumber
+        {
+            get => _pageNumber;
+            set => _pageNumber = value < 1 ? 1 : value;
+        }
+
+        public int PageSize
+        {
+            get => _pageSize;
+            set => _pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 1 : value;
+        }
+    }
+
+    public class PaginatedResponse<T>
+    {
+        public IEnumerable<T> Items { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public int TotalItems { get; set; }
+        public bool HasPrevious => PageNumber > 1;
+        public bool HasNext => PageNumber < TotalPages;
+    }
+
+
+
 
     [ApiController]
     [Route("product")]
@@ -49,15 +81,26 @@ namespace monchotradebackend.controllers
             _logger = logger;
         }
 
-        //Get all products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
+      [HttpGet]
+        public async Task<ActionResult<PaginatedResponse<ProductDto>>> GetAllProducts([FromQuery] PaginationParameters parameters)
         {
             try
             {
-                var products = await _dbRepository.GetQueryable()
+                // Get the base query
+                var query = _dbRepository.GetQueryable()
                     .Include(u => u.User)
-                    .Include(i => i.Images)
+                    .Include(i => i.Images);
+
+                // Get total count
+                var totalItems = await query.CountAsync();
+
+                // Calculate total pages
+                var totalPages = (int)Math.Ceiling(totalItems / (double)parameters.PageSize);
+
+                // Get paginated data
+                var products = await query
+                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                    .Take(parameters.PageSize)
                     .Select(p => new ProductDto
                     {
                         Id = p.Id,
@@ -65,10 +108,31 @@ namespace monchotradebackend.controllers
                         ImageUrl = p.Images.FirstOrDefault().Url,
                         OfferedBy = p.User != null ? p.User.Name : "",
                         Description = p.Description,
-                        Category = p.Category
-                    }).ToListAsync();
+                        Category = p.Category,
+                        TotalNumber = totalItems
+                    })
+                    .ToListAsync();
 
-                return Ok(products);
+                // Create pagination response
+                var response = new PaginatedResponse<ProductDto>
+                {
+                    Items = products,
+                    PageNumber = parameters.PageNumber,
+                    PageSize = parameters.PageSize,
+                    TotalPages = totalPages,
+                    TotalItems = totalItems
+                };
+
+                // Add pagination headers
+                Response.Headers.Add("X-Pagination", System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    totalItems,
+                    totalPages,
+                    currentPage = parameters.PageNumber,
+                    pageSize = parameters.PageSize
+                }));
+
+                return Ok(response);
             }
             catch (Exception ex)
             {

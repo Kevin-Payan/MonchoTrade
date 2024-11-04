@@ -13,7 +13,7 @@ public class ProductDto{
     public string ImageUrl {get;set;} = string.Empty;
     public string OfferedBy {get; set;} = string.Empty; 
     public string Description{get;set;} = string.Empty;
-
     public string Category {get;set;} = string.Empty; 
+    public int? TotalNumber {get;set;}
 
 }
