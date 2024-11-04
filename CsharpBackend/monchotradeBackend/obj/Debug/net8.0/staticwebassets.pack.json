@@ -17,12 +17,20 @@
       "PackagePath": "staticwebassets\\uploads\\products\\d8440f61-bf9a-45f8-b18c-e9b7e2d35ba8.jpg"
     },
     {
+      "Id": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\wwwroot\\uploads\\products\\default.jpg",
+      "PackagePath": "staticwebassets\\uploads\\products\\default.jpg"
+    },
+    {
       "Id": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\wwwroot\\uploads\\profiles\\64d3f2dd-200a-49d4-b1ac-cb3541ba22f0.jpg",
       "PackagePath": "staticwebassets\\uploads\\profiles\\64d3f2dd-200a-49d4-b1ac-cb3541ba22f0.jpg"
     },
     {
       "Id": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\wwwroot\\uploads\\profiles\\bae63af5-6084-465d-b4dc-b6549dee41ee.jpg",
       "PackagePath": "staticwebassets\\uploads\\profiles\\bae63af5-6084-465d-b4dc-b6549dee41ee.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\wwwroot\\uploads\\profiles\\default.jpg",
+      "PackagePath": "staticwebassets\\uploads\\profiles\\default.jpg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.monchotradeBackend.props",

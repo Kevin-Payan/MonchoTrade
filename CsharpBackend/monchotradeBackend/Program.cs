@@ -7,29 +7,33 @@ using Microsoft.EntityFrameworkCore;
 using authbackend.Data;
 using Microsoft.Extensions.FileProviders;
 
-
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-var connString = builder.Configuration.GetConnectionString("MonchoDb"); 
-builder.Services.AddDbContext<MonchoDbContext>(options => options.UseSqlServer(connString)); //Ajustar para sqlite o sqlserver 
- //Asi se inicializa lo de los servicios 
-builder.Services.AddScoped<IPasswordHashingService, PasswordHashingService>();  //Password service  
-builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));      //Repository service
-builder.Services.AddTransient<IFileService, FileService>();                     //File service
+builder.WebHost.UseUrls("http://localhost:5000", "https://localhost:7001");
 
-//Swagger support 
-builder.Services.AddEndpointsApiExplorer(); 
-builder.Services.AddSwaggerGen(); 
+// Database
+var connString = builder.Configuration.GetConnectionString("MonchoDb");
+builder.Services.AddDbContext<MonchoDbContext>(options => options.UseSqlServer(connString));
 
+// Services
+builder.Services.AddScoped<IPasswordHashingService, PasswordHashingService>();
+builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+builder.Services.AddTransient<IFileService, FileService>();
+
+// Important: Add these if not present
 builder.Services.AddControllers();
-
-
-//Deja que la pagina web se comunique con la api
-builder.Services.AddCors(options =>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MonchoTrade API", Version = "v1" });
+});
+
+// CORS
+builder.Services.AddCors(options => {
     options.AddPolicy("WebAccess", builder =>
     {
-        builder.WithOrigins("http://localhost:5173")
+        builder.WithOrigins("http://localhost:5173", "https://localhost:5173")
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -38,36 +42,32 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MonchoTrade API V1");
+        // This will serve Swagger UI at the app's root
+        c.RoutePrefix = string.Empty;
+    });
 }
 
-
-//Static files para ver las imagenes
-
+// Middleware order is important
+app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
-    RequestPath = ""
-});
-
 
 app.UseRouting();
 app.UseCors("WebAccess");
 
-// Mapea las rutas de los controladores
+// Add authentication/authorization if you're using it
+// app.UseAuthentication();
+// app.UseAuthorization();
+
 app.MapControllers();
 
-await app.MigrateDbAsync(); 
+await app.MigrateDbAsync();
 
 app.Run();
-
-
-
-
 

@@ -24,24 +24,36 @@
                     >
                 </button>
                 
-                <!-- Dropdown Menu -->
-                <div 
-                    v-show="isProfileMenuOpen"
-                    class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1"
-                >
-                    <a 
-                        href="/settings" 
-                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
-                    >
-                        Settings
-                    </a>
-                    <a 
-                        href="/logout" 
-                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
-                    >
-                        Logout
-                    </a>
-                </div>
+              <!-- Dropdown Menu -->
+<div 
+    v-show="isProfileMenuOpen"
+    class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1"
+>
+    <router-link 
+        to="/my-profile" 
+        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+    >
+        My Profile 
+    </router-link>
+    <router-link 
+        to="/my-products" 
+        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+    >
+        My Products
+    </router-link>
+    <router-link 
+        to="/my-exchanges" 
+        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+    >
+        My Exchanges
+    </router-link>
+    <router-link 
+        to="/login" 
+        class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+    >
+        Logout
+    </router-link>
+</div>
             </div>
 
             <button 

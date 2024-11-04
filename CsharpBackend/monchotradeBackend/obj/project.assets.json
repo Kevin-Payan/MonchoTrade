@@ -948,7 +948,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.OpenApi/1.6.14": {
+      "Microsoft.OpenApi/1.6.22": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/Microsoft.OpenApi.dll": {
@@ -3550,10 +3550,10 @@
         "runtime.json"
       ]
     },
-    "Microsoft.OpenApi/1.6.14": {
-      "sha512": "tTaBT8qjk3xINfESyOPE2rIellPvB7qpVqiWiyA/lACVvz+xOGiXhFUfohcx82NLbi5avzLW0lx+s6oAqQijfw==",
+    "Microsoft.OpenApi/1.6.22": {
+      "sha512": "aBvunmrdu/x+4CaA/UP1Jx4xWGwk4kymhoIRnn2Vp+zi5/KOPQJ9EkSXHRUr01WcGKtYl3Au7XfkPJbU1G2sjQ==",
       "type": "package",
-      "path": "microsoft.openapi/1.6.14",
+      "path": "microsoft.openapi/1.6.22",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3561,7 +3561,7 @@
         "lib/netstandard2.0/Microsoft.OpenApi.dll",
         "lib/netstandard2.0/Microsoft.OpenApi.pdb",
         "lib/netstandard2.0/Microsoft.OpenApi.xml",
-        "microsoft.openapi.1.6.14.nupkg.sha512",
+        "microsoft.openapi.1.6.22.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
     },
@@ -4992,6 +4992,7 @@
       "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.10",
       "Microsoft.EntityFrameworkCore.Sqlite >= 8.0.10",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.10",
+      "Microsoft.OpenApi >= 1.6.22",
       "Newtonsoft.Json >= 13.0.3",
       "Swashbuckle.AspNetCore >= 6.9.0"
     ]
@@ -5002,11 +5003,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
+      "projectUniqueName": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
       "projectName": "monchotradeBackend",
-      "projectPath": "c:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
+      "projectPath": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\monchotradeBackend.csproj",
       "packagesPath": "C:\\Users\\Fernando\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\obj\\",
+      "outputPath": "C:\\Users\\Fernando\\Desktop\\MonchoTrade\\CsharpBackend\\monchotradeBackend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Fernando\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -5069,6 +5070,10 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[8.0.10, )"
+          },
+          "Microsoft.OpenApi": {
+            "target": "Package",
+            "version": "[1.6.22, )"
           },
           "Newtonsoft.Json": {
             "target": "Package",

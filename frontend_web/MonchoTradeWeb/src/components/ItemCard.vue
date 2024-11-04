@@ -53,7 +53,7 @@
 
       <!-- Exchange Button -->
       <button
-        @click="$emit('propose-exchange')"
+        @click="handleProposeExchange "
         class="w-full bg-black text-white py-2 px-4 rounded-md flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="loading"
       >
@@ -78,6 +78,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from "vue-router";
+const router = useRouter(); // Instantiate router
 
 const props = defineProps({
   title: {
@@ -98,8 +100,9 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['propose-exchange'])
-
+const handleProposeExchange = () => {
+  router.push(`/propose-exchange`)
+}
 const loading = ref(true)
 const imageError = ref(false)
 

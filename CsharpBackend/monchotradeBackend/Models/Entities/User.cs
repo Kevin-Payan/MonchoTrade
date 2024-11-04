@@ -37,6 +37,6 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
 
     // Virtual navigation properties for lazy loading
-    public virtual ICollection<ProfileImage> Images { get; set; } = new List<ProfileImage>();
+    public virtual ProfileImage? ProfileImage { get; set; }
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

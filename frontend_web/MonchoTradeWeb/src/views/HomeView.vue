@@ -20,7 +20,7 @@ import axios from 'axios';
         featuredItems.value = response.data.map(product => ({
         id: product.id,
         title: product.title,
-        imageUrl: appsettings.apiUrl + "/uploads/products/" +  product.imageUrl || '/default.jpg', // Fallback if imageUrl is missing
+        imageUrl: appsettings.apiUrl + "/uploads/products/" +  (product.imageUrl || '/default.jpg'), // Fallback if imageUrl is missing
         offeredBy: product.offeredBy,
         description: product.description,
         category: product.category

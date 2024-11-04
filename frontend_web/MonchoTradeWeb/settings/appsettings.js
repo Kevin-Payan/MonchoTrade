@@ -1,5 +1,5 @@
 export const appsettings = {
-    apiUrl : 'http://localhost:5121',
+    apiUrl : 'https://localhost:7001',
     sessionRoute : '/session',
     profileImageRoute: '/profileimage', 
     productRoute: '/product',
