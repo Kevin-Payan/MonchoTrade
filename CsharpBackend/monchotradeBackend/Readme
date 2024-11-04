@@ -7,3 +7,12 @@ Crear base de datos local si es que no existe:
 
 Agregar migraciones/cambios a la base de datos, a futuro:
 4) dotnet ef migrations add UsuariosSeed 
+
+Problemas con azure: 
+1) Unzip localDbBackEnd.7z 
+Dentro de la carpeta generada corre: 
+1)dotnet restore 
+2)dotnet run 
+LISTO 
+
+la base de datos local tiene los datos actualizados hasta el 4-11-24 11:39 am 
