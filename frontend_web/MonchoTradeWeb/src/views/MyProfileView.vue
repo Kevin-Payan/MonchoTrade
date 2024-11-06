@@ -161,6 +161,12 @@ import axios from 'axios';
   },
   };
 
+  const axiosPatchConfig = {
+    headers: {
+    "Content-Type": 'application/json-patch+json',
+  },
+  }
+
 // State
 const userProfile = ref({})
 const formData = ref({})
@@ -212,7 +218,7 @@ const handleImageUpload = () => {
       
       try {
         loading.value = true
-        const response = await axios.put(`/user/${userProfile.value.id}/profile-image`, formData, {
+        const response = await axios.put(`/user/${storedId}/profile-image`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -231,29 +237,47 @@ const handleImageUpload = () => {
 const updateProfile = async () => {
   loading.value = true
   error.value = null
+  
+  // Generate patch operations for changed fields
+  const patchDocument = Object.entries(formData.value).reduce((patches, [key, value]) => {
+    if (value !== userProfile.value[key]) {
+      patches.push({
+        op: key in userProfile.value ? 'replace' : 'add',
+        path: `/${key}`,
+        value: value
+      })
+    }
+    return patches
+  }, [])
 
-  try {
-    const response = await axios.patch(`/user/${userProfile.value.id}/name`, {
-      name: formData.value.name
-    })
-    userProfile.value = response.data
-    error.value = null
-  } catch (err) {
-    error.value = err.response?.data?.error || 'Error updating profile'
-  } finally {
-    loading.value = false
+  if (patchDocument.length > 0) {
+    try {
+      const response = await axios({
+        method: 'PATCH',
+        url: `${appsettings.apiUrl}/user/${storedId}`,
+        headers: {
+          'Content-Type': 'application/json-patch+json'
+        },
+        data: patchDocument
+      })
+      
+      userProfile.value = response.data
+      error.value = null
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Error updating profile'
+    }
   }
+  
+  loading.value = false
 }
 
+// More efficient reset using Object.assign or spread operator
 const resetForm = () => {
-  formData.value = {
-    name: userProfile.value.name,
-    lastName: userProfile.value.lastName,
-    secondLastName: userProfile.value.secondLastName,
-    phoneNumber: userProfile.value.phoneNumber,
-    country: userProfile.value.country
-  }
+  formData.value = { ...userProfile.value }
+  // Or alternatively:
+  // formData.value = Object.assign({}, userProfile.value)
 }
+
 </script>
 
 <style scoped>
