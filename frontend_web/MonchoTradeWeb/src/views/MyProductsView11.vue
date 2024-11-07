@@ -17,12 +17,8 @@
           </button>
           
           <ProductModal 
-            :visible="showProductModal"
-            :is-edit="isEditMode"
-            :product-to-edit="productToEdit"
-            @close="showProductModal = false"
+            ref="productModalRef"
             @product-created="handleProductCreated"
-            @product-updated="handleProductUpdated"
           />
         </div>
       </div>
@@ -58,7 +54,7 @@
       :visible="showProductDetails"
       :product="selectedProduct"
       @close="closeProductDetails"
-      @edit="openEditProductModal(product)"
+      @edit="handleEdit"
       @changeImage="handleChangeImage"
       @delete="handleDelete"
       @toggleStatus="handleToggleStatus"
@@ -66,44 +62,15 @@
 
 
     <!-- Modal para Actualizar Imagen -->
-    <div v-if="showUpdateModal" class="modal-backdrop">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="text-lg font-medium">Actualizar Imagen</h3>
-          <button @click="closeUpdateModal" class="text-gray-500 hover:text-gray-700">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <form @submit.prevent="updateProductImage" class="p-6 space-y-4">
-          <div class="form-group">
-            <label class="label">Nueva Imagen</label>
-            <input 
-              type="file" 
-              @change="handleImageUpload"
-              accept="image/*"
-              class="input"
-              required
-            >
-          </div>
-          
-          <div class="flex justify-end gap-4">
-            <button 
-              type="button" 
-              @click="closeUpdateModal" 
-              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-            >
-              Cancelar
-            </button>
-            <button 
-              type="submit" 
-              class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-            >
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <ImageUpload
+  v-if="showUpdateModal"
+  :visible="showUpdateModal"
+  :current-image="selectedProduct?.imageUrl"
+  @close="showUpdateModal = false"
+  @update="handleImageSubmit"
+/>
+
+
   </div>
 </template>
 
@@ -113,37 +80,19 @@ import axios from 'axios'
 import { appsettings } from '../../settings/appsettings'
 import ProductModal from '@/components/ProductModal.vue'
 import ProductDetailsModal from '@/components/ProductDetailsModal.vue'
-
-const showProductModal = ref(false)
-const isEditMode = ref(false)
-const productToEdit = ref(null)
-
-const openAddProductModal = () => {
-  isEditMode.value = false
-  productToEdit.value = null
-  showProductModal.value = true
-}
-
-const openEditProductModal = (product) => {
-  isEditMode.value = true
-  productToEdit.value = product
-  showProductModal.value = true
-}
-
-const handleProductCreated = () => {
-  fetchProducts()
-}
-
-const handleProductUpdated = () => {
-  fetchProducts()
-}
-
-
+import ImageUpload from '@/components/ImageUpload.vue'  // Add this import
 
 //Funciones de ProductModal
 const productModalRef = ref(null)
 
+const openAddProductModal = () => {
+  productModalRef.value.openAddModal()
+}
 
+const handleProductCreated = () => {
+  // You'll need to implement fetchProducts()
+  fetchProducts() 
+}
 
 //Ref para product modal 
 const showProductDetails = ref(false)
@@ -160,6 +109,35 @@ const productForm = ref({
   imageUrl: null,
   isActive: true
 })
+
+
+//Metodo para modal imagenes 
+const handleImageSubmit = async (formData) => {
+  try {
+    const response = await axios.post(
+      `${appsettings.apiUrl}/products/${selectedProduct.value.id}/image`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    )
+    
+    // Update the product's image URL
+    selectedProduct.value.imageUrl = response.data.imageUrl
+    
+    // Refresh products list
+    await fetchProducts()
+    
+    // Close modal
+    closeUpdateModal()
+  } catch (error) {
+    console.error('Error uploading image:', error)
+    // You might want to show an error notification here
+  }
+}
+
 
 // New methods for product details modal
 const openProductDetails = (product) => {
@@ -180,7 +158,6 @@ const handleEdit = (product) => {
 const handleChangeImage = (product) => {
   selectedProduct.value = product
   showUpdateModal.value = true
-  closeProductDetails()
 }
 
 const handleDelete = async (product) => {
@@ -221,20 +198,6 @@ const fetchProducts = async () => {
   }
 }
 
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    // Aquí normalmente subirías la imagen a tu servidor
-    // y obtendrías la URL para guardarla
-    const imageUrl = URL.createObjectURL(file)
-    if (selectedProduct.value) {
-      selectedProduct.value.imageUrl = imageUrl
-    } else {
-      productForm.value.imageUrl = imageUrl
-    }
-  }
-}
-
 const openUpdateModal = (product) => {
   selectedProduct.value = product
   showUpdateModal.value = true
@@ -245,18 +208,6 @@ const closeUpdateModal = () => {
   selectedProduct.value = null
 }
 
-
-const updateProductImage = async () => {
-  try {
-    await axios.patch(`/api/products/${selectedProduct.value.id}`, {
-      imageUrl: selectedProduct.value.imageUrl
-    })
-    await fetchProducts()
-    closeUpdateModal()
-  } catch (error) {
-    console.error('Error updating product image:', error)
-  }
-}
 
 // Cargar productos al montar el componente
 onMounted(() => {

@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import SingupView from '@/views/SingupView.vue'
 import LoginView from '@/views/LoginView.vue'
-import UploadProductView from '@/views/UploadProductView.vue'
 import MyProfileView from '@/views/MyProfileView.vue'
 import MyProductsView from '@/views/MyProductsView.vue'
 import MyExchangesView from '@/views/MyExchangesView.vue'
@@ -25,11 +24,6 @@ const router = createRouter({
       path: '/singup',
       name: 'singup',
       component: SingupView
-    },
-    {
-      path: '/uploadproduct',
-      name: 'uploadproduct',
-      component: UploadProductView
     },
     {
       path: '/my-profile',

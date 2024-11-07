@@ -1,245 +1,293 @@
-<template>
-    <div v-if="showAddModal" class="modal-backdrop">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="text-lg font-medium">{{ editingProduct ? 'Editar Producto' : 'Agregar Nuevo Producto' }}</h3>
-          <button @click="closeAddModal" class="text-gray-500 hover:text-gray-700">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <form @submit.prevent="saveProduct" class="p-6 space-y-4">
-          <div class="form-group">
-            <label class="label">Nombre del Producto *</label>
-            <input 
-              v-model="productForm.name"
-              type="text" 
-              class="input"
-              required
-              maxlength="100"
-              placeholder="Nombre del producto (máx. 100 caracteres)"
-            >
-          </div>
-  
-          <div class="form-group">
-            <label class="label">Categoría *</label>
-            <select 
-              v-model="productForm.category" 
-              class="input"
-              required
-            >
-              <option value="">Selecciona una categoría</option>
-              <option v-for="category in categories" :key="category" :value="category">
-                {{ category }}
-              </option>
-            </select>
-          </div>
-  
-          <div class="form-group">
-            <label class="label">Descripción</label>
-            <textarea 
-              v-model="productForm.description"
-              class="input min-h-[100px]"
-              maxlength="500"
-              placeholder="Describe tu producto (máx. 500 caracteres)"
-            ></textarea>
-            <span class="text-xs text-gray-500">
-              {{ productForm.description.length }}/500 caracteres
-            </span>
-          </div>
-  
-          <div class="form-group">
-            <label class="label">Cantidad *</label>
-            <input 
-              v-model.number="productForm.quantity"
-              type="number" 
-              min="0"
-              class="input"
-              required
-            >
-          </div>
-  
-          <div class="form-group">
-            <label class="label">Imágenes</label>
-            <input 
-              type="file" 
-              @change="handleImageUpload"
-              accept="image/*"
-              multiple
-              class="input"
-            >
-            <div v-if="selectedImages.length > 0" class="mt-2 flex gap-2 flex-wrap">
-              <div 
-                v-for="(image, index) in selectedImages" 
-                :key="index"
-                class="relative w-20 h-20"
-              >
-                <img 
-                  :src="image.preview" 
-                  class="w-full h-full object-cover rounded-lg"
-                  alt="Preview"
-                >
-                <button 
-                  @click="removeImage(index)"
-                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                  type="button"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <div class="form-group">
-            <label class="flex items-center space-x-2">
-              <input 
-                type="checkbox" 
-                v-model="productForm.isActive"
-                class="form-checkbox h-4 w-4 text-black rounded border-gray-300"
-              >
-              <span class="text-sm text-gray-700">Producto Activo</span>
-            </label>
-          </div>
-  
-          <div class="flex justify-end gap-4">
-            <button 
-              type="button" 
-              @click="closeAddModal" 
-              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-            >
-              Cancelar
-            </button>
-            <button 
-              type="submit" 
-              class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-            >
-              {{ editingProduct ? 'Guardar Cambios' : 'Crear Producto' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue'
-  
-  const props = defineProps({
-    showAddModal: Boolean,
-    editingProduct: Object
-  })
-  
-  const emit = defineEmits(['close', 'save'])
-  
-  // Categorías disponibles
-  const categories = [
-    'Electrónica',
-    'Ropa',
-    'Hogar',
-    'Deportes',
-    'Libros',
-    'Otros'
-  ]
-  
-  // Estado del formulario
-  const productForm = ref({
-    name: '',
-    category: '',
-    description: '',
-    quantity: 0,
-    isActive: true,
-  })
-  
-  const selectedImages = ref([])
-  
-  // Observar cambios en editingProduct para actualizar el formulario
-  watch(() => props.editingProduct, (newProduct) => {
-    if (newProduct) {
-      productForm.value = {
-        name: newProduct.name,
-        category: newProduct.category,
-        description: newProduct.description || '',
-        quantity: newProduct.quantity,
-        isActive: newProduct.isActive
-      }
-    } else {
-      resetForm()
+<script setup>
+import { ref, reactive, watch } from 'vue'
+
+const props = defineProps({
+  isEdit: {
+    type: Boolean,
+    default: false
+  },
+  productToEdit: {
+    type: Object,
+    default: null
+  },
+  visible: {
+    type: Boolean,
+    required: true
+  }
+})
+
+const emit = defineEmits(['close', 'product-created', 'product-updated'])
+
+// Form state
+const productForm = reactive({
+  name: '',
+  description: '',
+  quantity: 0,
+  category: '',
+  isActive: true,
+})
+
+// Images state
+const selectedImages = ref([])
+const showModal = ref(false)
+
+// Watch for changes in productToEdit to populate form
+watch(() => props.productToEdit, (newVal) => {
+  if (newVal) {
+    productForm.name = newVal.name
+    productForm.description = newVal.description
+    productForm.quantity = newVal.quantity
+    productForm.category = newVal.category
+    productForm.isActive = newVal.isActive
+    if (newVal.imageUrl) {
+      selectedImages.value = [{
+        preview: newVal.imageUrl,
+        isExisting: true
+      }]
     }
-  }, { immediate: true })
-  
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files)
-    files.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        selectedImages.value.push({
-          file: file,
-          preview: e.target.result
-        })
-      }
-      reader.readAsDataURL(file)
-    })
   }
+}, { immediate: true })
+
+const handleImageUpload = (event) => {
+  const files = Array.from(event.target.files)
   
-  const removeImage = (index) => {
-    selectedImages.value.splice(index, 1)
-  }
-  
-  const resetForm = () => {
-    productForm.value = {
-      name: '',
-      category: '',
-      description: '',
-      quantity: 0,
-      isActive: true
+  files.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      selectedImages.value.push({
+        file: file,
+        preview: URL.createObjectURL(file)
+      })
     }
-    selectedImages.value = []
+  })
+}
+
+const removeImage = (index) => {
+  if (selectedImages.value[index].preview.startsWith('blob:')) {
+    URL.revokeObjectURL(selectedImages.value[index].preview)
   }
-  
-  const closeAddModal = () => {
-    resetForm()
-    emit('close')
-  }
-  
-  const saveProduct = () => {
+  selectedImages.value.splice(index, 1)
+}
+
+const resetForm = () => {
+  productForm.name = ''
+  productForm.description = ''
+  productForm.quantity = 0
+  productForm.category = ''
+  productForm.isActive = true
+  selectedImages.value = []
+}
+
+const closeModal = () => {
+  resetForm()
+  emit('close')
+}
+
+const saveProduct = async () => {
+  try {
     const formData = new FormData()
     
-    // Agregar datos del producto
-    Object.keys(productForm.value).forEach(key => {
-      formData.append(key, productForm.value[key])
+    // Append product data
+    formData.append('name', productForm.name)
+    formData.append('description', productForm.description)
+    formData.append('quantity', productForm.quantity)
+    formData.append('category', productForm.category)
+    formData.append('isActive', productForm.isActive)
+    
+    // Append images
+    selectedImages.value.forEach((image, index) => {
+      if (!image.isExisting) {
+        formData.append(`images[${index}]`, image.file)
+      }
     })
     
-    // Agregar imágenes
-    selectedImages.value.forEach((image, index) => {
-      formData.append(`images[${index}]`, image.file)
+    // Make API call
+    const url = props.isEdit 
+      ? `${appsettings.apiUrl}/products/${props.productToEdit.id}`
+      : `${appsettings.apiUrl}/products`
+    
+    const method = props.isEdit ? 'PATCH' : 'POST'
+    
+    const response = await fetch(url, {
+      method,
+      body: formData
     })
-  
-    emit('save', formData)
+    
+    if (!response.ok) {
+      throw new Error(props.isEdit ? 'Error updating product' : 'Error creating product')
+    }
+    
+    // Emit appropriate event
+    emit(props.isEdit ? 'product-updated' : 'product-created')
+    
+    // Show success message
+    alert(props.isEdit ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente')
+    
+    closeModal()
+    
+  } catch (error) {
+    console.error('Error saving product:', error)
+    alert(props.isEdit ? 'Error al actualizar el producto' : 'Error al crear el producto')
   }
-  </script>
-  
-  <style scoped>
-  .modal-backdrop {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
-  }
-  
-  .modal-content {
-    @apply bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto;
-  }
-  
-  .modal-header {
-    @apply flex justify-between items-center p-6 border-b border-gray-200;
-  }
-  
-  .form-group {
-    @apply flex flex-col;
-  }
-  
-  .label {
-    @apply text-sm font-medium text-gray-700 mb-1;
-  }
-  
-  .input {
-    @apply border border-gray-300 rounded-md px-3 py-2 focus:outline-none 
-           focus:ring-2 focus:ring-gray-500 focus:border-transparent;
-  }
-  </style>
+}
+</script>
+
+<template>
+  <div v-if="visible" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="text-lg font-medium">
+          {{ isEdit ? 'Editar Producto' : 'Agregar Nuevo Producto' }}
+        </h3>
+        <button @click="closeModal" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Add the form content -->
+      <form @submit.prevent="saveProduct" class="p-6 space-y-4">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="label">Nombre del Producto *</label>
+          <input 
+            v-model="productForm.name"
+            type="text" 
+            class="input"
+            required
+            maxlength="100"
+            placeholder="Máximo 100 caracteres"
+          >
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label class="label">Descripción</label>
+          <textarea 
+            v-model="productForm.description"
+            class="input min-h-[100px]"
+            maxlength="500"
+            placeholder="Máximo 500 caracteres"
+          ></textarea>
+          <span class="text-xs text-gray-500">
+            {{ productForm.description.length }}/500 caracteres
+          </span>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="form-group">
+          <label class="label">Cantidad *</label>
+          <input 
+            v-model.number="productForm.quantity"
+            type="number" 
+            min="0"
+            class="input"
+            required
+          >
+        </div>
+
+        <!-- Categoría -->
+        <div class="form-group">
+          <label class="label">Categoría *</label>
+          <select 
+            v-model="productForm.category"
+            class="input"
+            required
+          >
+            <option value="">Selecciona una categoría</option>
+            <option value="Electrónica">Electrónica</option>
+            <option value="Ropa">Ropa</option>
+            <option value="Hogar">Hogar</option>
+            <option value="Deportes">Deportes</option>
+            <option value="Libros">Libros</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+
+        <!-- Estado Activo -->
+        <div class="form-group">
+          <label class="flex items-center space-x-2">
+            <input 
+              type="checkbox"
+              v-model="productForm.isActive"
+              class="form-checkbox h-4 w-4 text-black rounded border-gray-300"
+            >
+            <span class="text-sm text-gray-700">Producto Activo</span>
+          </label>
+        </div>
+
+        <!-- Imágenes -->
+        <div class="form-group">
+          <label class="label">Imágenes</label>
+          <input 
+            type="file"
+            @change="handleImageUpload"
+            accept="image/*"
+            class="input"
+          >
+          <!-- Preview de imágenes -->
+          <div v-if="selectedImages.length" class="mt-2 flex gap-2 flex-wrap">
+            <div 
+              v-for="(image, index) in selectedImages" 
+              :key="index"
+              class="relative w-20 h-20"
+            >
+              <img 
+                :src="image.preview"
+                class="w-full h-full object-cover rounded-lg"
+                alt="Preview"
+              >
+              <button 
+                @click="removeImage(index)"
+                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+          <button 
+            type="button" 
+            @click="closeModal" 
+            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+          >
+            {{ isEdit ? 'Guardar Cambios' : 'Crear Producto' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto;
+}
+
+.modal-header {
+  @apply flex justify-between items-center p-6 border-b border-gray-200;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent;
+}
+</style>
