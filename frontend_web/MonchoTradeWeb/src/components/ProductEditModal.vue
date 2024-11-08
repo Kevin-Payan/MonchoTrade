@@ -1,14 +1,11 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
+import { appsettings } from '../../settings/appsettings';
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    default: false
-  },
   productToEdit: {
     type: Object,
-    default: null
+    required: true  // Este modal solo se muestra cuando hay un producto para editar
   },
   visible: {
     type: Boolean,
@@ -16,7 +13,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'product-created', 'product-updated'])
+const emit = defineEmits(['close', 'product-updated'])
 
 // Form state
 const productForm = reactive({
@@ -29,24 +26,21 @@ const productForm = reactive({
 
 // Images state
 const selectedImages = ref([])
-const showModal = ref(false)
 
-// Watch for changes in productToEdit to populate form
-watch(() => props.productToEdit, (newVal) => {
-  if (newVal) {
-    productForm.name = newVal.name
-    productForm.description = newVal.description
-    productForm.quantity = newVal.quantity
-    productForm.category = newVal.category
-    productForm.isActive = newVal.isActive
-    if (newVal.imageUrl) {
-      selectedImages.value = [{
-        preview: newVal.imageUrl,
-        isExisting: true
-      }]
-    }
+// Watch for changes in productToEdit to populate form when modal opens
+watch(() => props.visible, (newVal) => {
+  if (newVal && props.productToEdit) {  // Si el modal se abre y hay un producto para editar
+    productForm.name = props.productToEdit.title
+    productForm.description = props.productToEdit.description
+    productForm.quantity = props.productToEdit.quantity
+    productForm.category = props.productToEdit.category
+    productForm.isActive = props.productToEdit.isActive
+    selectedImages.value = props.productToEdit.imageUrl ? [{
+      preview: props.productToEdit.imageUrl,
+      isExisting: true
+    }] : []
   }
-}, { immediate: true })
+})
 
 const handleImageUpload = (event) => {
   const files = Array.from(event.target.files)
@@ -68,21 +62,11 @@ const removeImage = (index) => {
   selectedImages.value.splice(index, 1)
 }
 
-const resetForm = () => {
-  productForm.name = ''
-  productForm.description = ''
-  productForm.quantity = 0
-  productForm.category = ''
-  productForm.isActive = true
-  selectedImages.value = []
-}
-
 const closeModal = () => {
-  resetForm()
   emit('close')
 }
 
-const saveProduct = async () => {
+const updateProduct = async () => {
   try {
     const formData = new FormData()
     
@@ -100,51 +84,41 @@ const saveProduct = async () => {
       }
     })
     
-    // Make API call
-    const url = props.isEdit 
-      ? `${appsettings.apiUrl}/products/${props.productToEdit.id}`
-      : `${appsettings.apiUrl}/products`
-    
-    const method = props.isEdit ? 'PATCH' : 'POST'
-    
+    // API call for update
+    const url = `${appsettings.apiUrl}/products/${props.productToEdit.id}`
     const response = await fetch(url, {
-      method,
+      method: 'PATCH',
       body: formData
     })
     
     if (!response.ok) {
-      throw new Error(props.isEdit ? 'Error updating product' : 'Error creating product')
+      throw new Error('Error updating product')
     }
     
-    // Emit appropriate event
-    emit(props.isEdit ? 'product-updated' : 'product-created')
-    
-    // Show success message
-    alert(props.isEdit ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente')
-    
+    // Emit update event
+    emit('product-updated')
+    alert('Producto actualizado exitosamente')
     closeModal()
     
   } catch (error) {
     console.error('Error saving product:', error)
-    alert(props.isEdit ? 'Error al actualizar el producto' : 'Error al crear el producto')
+    alert('Error al actualizar el producto')
   }
 }
 </script>
 
 <template>
-  <div v-if="visible" class="modal-backdrop">
+  <div v-if="visible && productToEdit" class="modal-backdrop">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="text-lg font-medium">
-          {{ isEdit ? 'Editar Producto' : 'Agregar Nuevo Producto' }}
-        </h3>
+        <h3 class="text-lg font-medium">Editar Producto</h3>
         <button @click="closeModal" class="text-gray-500 hover:text-gray-700">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <!-- Add the form content -->
-      <form @submit.prevent="saveProduct" class="p-6 space-y-4">
+      <!-- Form content -->
+      <form @submit.prevent="updateProduct" class="p-6 space-y-4">
         <!-- Nombre -->
         <div class="form-group">
           <label class="label">Nombre del Producto *</label>
@@ -223,7 +197,6 @@ const saveProduct = async () => {
             accept="image/*"
             class="input"
           >
-          <!-- Preview de imágenes -->
           <div v-if="selectedImages.length" class="mt-2 flex gap-2 flex-wrap">
             <div 
               v-for="(image, index) in selectedImages" 
@@ -258,7 +231,7 @@ const saveProduct = async () => {
             type="submit" 
             class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
           >
-            {{ isEdit ? 'Guardar Cambios' : 'Crear Producto' }}
+            Guardar Cambios
           </button>
         </div>
       </form>
