@@ -135,6 +135,9 @@ const productToEdit = ref(null)
 const products = ref([])
 
 // Cargar productos al montar el componente
+
+
+
 const fetchProducts = async () => {
   try {
     const userId = localStorage.getItem('userId')
@@ -165,7 +168,16 @@ const openEditProductModal = (product) => {
   showProductEditModal.value = true
 }
 
-const handleProductCreated = () => {
+const handleProductCreated = (product) => {
+
+  console.log(product)
+
+  /*
+  try{
+    await axios.post(`${appsettings.apiUrl}${appsettings.productRoute}`, product); 
+  }catch(error){
+
+  }*/
   fetchProducts()
 }
 

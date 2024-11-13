@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { appsettings } from '../../settings/appsettings';
+import axios from 'axios';
 
 const props = defineProps({
   visible: {
@@ -13,7 +14,7 @@ const emit = defineEmits(['close', 'product-created'])
 
 // Form state
 const productForm = reactive({
-  name: '',
+  title: '',
   description: '',
   quantity: 0,
   category: '',
@@ -45,7 +46,7 @@ const removeImage = (index) => {
 }
 
 const resetForm = () => {
-  productForm.name = ''
+  productForm.title = ''
   productForm.description = ''
   productForm.quantity = 0
   productForm.category = ''
@@ -63,23 +64,33 @@ const saveProduct = async () => {
     const formData = new FormData()
     
     // Append product data
-    formData.append('name', productForm.name)
-    formData.append('description', productForm.description)
-    formData.append('quantity', productForm.quantity)
-    formData.append('category', productForm.category)
-    formData.append('isActive', productForm.isActive)
+    const storedId = parseInt(localStorage.getItem("userId"), 10);
+
+    formData.append('UserId', storedId)
+    formData.append('Title', productForm.title)
+    formData.append('Description', productForm.description)
+    formData.append('Quantity', productForm.quantity)
+    formData.append('Category', productForm.category)
+    formData.append('IsActive', productForm.isActive)
     
     // Append images
-    selectedImages.value.forEach((image, index) => {
-      formData.append(`images[${index}]`, image.file)
-    })
+    if (selectedImages.value.length > 0) {
+      formData.append('ImageFile', selectedImages.value[0].file)
+    }
+
+
+     // Make API call
+     const response = await axios.post(
+      `${appsettings.apiUrl}${appsettings.productRoute}`, 
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
     
-    // Make API call
-    const response = await fetch(`${appsettings.apiUrl}/products`, {
-      method: 'POST',
-      body: formData
-    })
-    
+    console.log(formData)
     if (!response.ok) {
       throw new Error('Error creating product')
     }
@@ -115,7 +126,7 @@ const saveProduct = async () => {
         <div class="form-group">
           <label class="label">Nombre del Producto *</label>
           <input 
-            v-model="productForm.name"
+            v-model="productForm.title"
             type="text" 
             class="input"
             required
@@ -159,12 +170,15 @@ const saveProduct = async () => {
             required
           >
             <option value="">Selecciona una categoría</option>
-            <option value="Electrónica">Electrónica</option>
-            <option value="Ropa">Ropa</option>
-            <option value="Hogar">Hogar</option>
-            <option value="Deportes">Deportes</option>
-            <option value="Libros">Libros</option>
-            <option value="Otros">Otros</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Kitchen">Kitchen</option>
+            <option value="Home Decor">Home Decor</option>
+            <option value="Footwear">Footwear</option>
+            <option value="Office Supplies">Office Supplies</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 

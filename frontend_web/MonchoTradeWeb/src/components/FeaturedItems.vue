@@ -10,6 +10,7 @@
         :image-url="item.imageUrl"
         :offered-by="item.offeredBy"
         :description="item.description"
+        :category="item.category"
         @propose-exchange="$emit('propose-exchange', item.id)"
       />
     </div>

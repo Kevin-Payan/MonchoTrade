@@ -48,6 +48,10 @@
       </p>
 
       <div class="text-sm text-gray-600">
+        Category: <span class="font-medium">{{ category }}</span>
+      </div>
+
+      <div class="text-sm text-gray-600">
         Offered by: <span class="font-medium">{{ offeredBy }}</span>
       </div>
 
@@ -97,6 +101,10 @@ const props = defineProps({
   },
   description: {
     type: String,
+    default: ''
+  },
+  category: {
+    type: String, 
     default: ''
   }
 });
