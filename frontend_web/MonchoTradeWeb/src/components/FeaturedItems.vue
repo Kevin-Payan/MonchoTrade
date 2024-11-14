@@ -6,12 +6,13 @@
       <ItemCard
         v-for="item in items"
         :key="item.id"
+        :id="item.id"
         :title="item.title"
         :image-url="item.imageUrl"
         :offered-by="item.offeredBy"
         :description="item.description"
         :category="item.category"
-        @propose-exchange="$emit('propose-exchange', item.id)"
+        @propose-exchange="handleExchange"
       />
     </div>
   </div>

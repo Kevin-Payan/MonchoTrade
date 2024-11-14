@@ -87,6 +87,10 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const props = defineProps({
+  id:{
+    type: Number,
+    required: true
+  },
   title: {
     type: String,
     required: true
@@ -124,6 +128,8 @@ const handleImageError = () => {
 };
 
 const handleProposeExchange = () => {
+  console.log(props.id)
+  localStorage.setItem('proposedExchange', props.id);
   emit('propose-exchange');
   router.push('/propose-exchange');
 };

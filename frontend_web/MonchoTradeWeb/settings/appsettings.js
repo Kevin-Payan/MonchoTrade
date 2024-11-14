@@ -3,4 +3,5 @@ export const appsettings = {
     sessionRoute : '/session',
     profileImageRoute: '/profileimage', 
     productRoute: '/product',
+    userRoute: '/user'
 }

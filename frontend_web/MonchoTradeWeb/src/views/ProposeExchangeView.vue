@@ -150,12 +150,16 @@
            acceptTerms.value && 
            acceptCommunication.value
   })
-  
+
+//route.params.id investigar
+
+const ItemYouWant = parseInt(localStorage.getItem("proposedExchange"), 10); 
+const YourId = parseInt(localStorage.getItem("userId"), 10);
   // Métodos
   const fetchSelectedItem = async () => {
     try {
       const response = await axios.get(
-        `${appsettings.apiUrl}${appsettings.productRoute}/${route.params.id}`,
+        `${appsettings.apiUrl}${appsettings.productRoute}/${ItemYouWant}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -175,7 +179,7 @@
   const fetchMyItems = async () => {
     try {
       const response = await axios.get(
-        `${appsettings.apiUrl}${appsettings.productRoute}/my-items`, // Ajusta la ruta según tu API
+        `${appsettings.apiUrl}${appsettings.userRoute}/products/${YourId}`, // Ajusta la ruta según tu API
         {
           headers: {
             "Content-Type": "application/json",
@@ -185,7 +189,7 @@
       )
       myItems.value = response.data.map(item => ({
         ...item,
-        imageUrl: appsettings.apiUrl + "/uploads/products/" + (item.imageUrl || '/default.jpg')
+        imageUrl:  (item.imageUrl || 'https://localhost:7001/uploads/products/default.jpg')
       }))
     } catch (error) {
       console.error('Error fetching my items:', error)

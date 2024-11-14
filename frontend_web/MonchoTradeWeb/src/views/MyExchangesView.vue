@@ -41,32 +41,6 @@
   
       <!-- Contenido Principal -->
       <main class="container mx-auto px-4 py-8">
-        <!-- Tarjetas de Estadísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div v-for="stat in stats" :key="stat.title" 
-               class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-sm text-gray-500">{{ stat.title }}</p>
-                <p class="text-2xl font-bold mt-1">{{ stat.value }}</p>
-              </div>
-              <span :class="[
-                'text-sm px-2 py-1 rounded-full',
-                stat.trend > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              ]">
-                {{ stat.trend > 0 ? '+' : '' }}{{ stat.trend }}%
-              </span>
-            </div>
-            <div class="mt-4">
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  class="bg-blue-600 h-2 rounded-full" 
-                  :style="{ width: `${stat.progress}%` }"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
   
         <!-- Lista de Intercambios -->
         <div class="bg-white rounded-lg shadow">
