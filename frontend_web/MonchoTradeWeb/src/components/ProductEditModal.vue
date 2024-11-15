@@ -1,6 +1,7 @@
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch,onMounted  } from 'vue'
 import { appsettings } from '../../settings/appsettings';
+import axios from 'axios';
 
 const props = defineProps({
   productToEdit: {
@@ -12,6 +13,10 @@ const props = defineProps({
     required: true
   }
 })
+
+
+const categories = ref([]);
+const isLoadingCategories = ref(false);
 
 const emit = defineEmits(['close', 'product-updated'])
 
@@ -29,6 +34,7 @@ const selectedImages = ref([])
 
 // Watch for changes in productToEdit to populate form when modal opens
 watch(() => props.visible, (newVal) => {
+
   if (newVal && props.productToEdit) {  // Si el modal se abre y hay un producto para editar
     productForm.name = props.productToEdit.title
     productForm.description = props.productToEdit.description
@@ -39,8 +45,20 @@ watch(() => props.visible, (newVal) => {
       preview: props.productToEdit.imageUrl,
       isExisting: true
     }] : []
+
+    if (categories.value.length > 0) {
+      setDefaultCategory()
+    }
   }
 })
+
+// Watch para cuando las categorías se cargan
+watch(() => categories.value, () => {
+  if (props.visible && props.productToEdit && categories.value.length > 0) {
+    setDefaultCategory()
+  }
+})
+
 
 const handleImageUpload = (event) => {
   const files = Array.from(event.target.files)
@@ -66,6 +84,33 @@ const closeModal = () => {
   emit('close')
 }
 
+ // Función auxiliar para establecer la categoría por defecto
+ const setDefaultCategory = () => {
+  console.log('Product category:', props.productToEdit.category)
+  console.log('Available categories:', categories.value.map(c => c.title || c.name))
+  if (props.productToEdit.category) {
+    productForm.category = props.productToEdit.category
+  }
+}
+
+const fetchCategories = async () => {
+  isLoadingCategories.value = true;
+  try {
+    const response = await axios.get(`${appsettings.apiUrl}${appsettings.categoriesRoute}`, appsettings.axiosConfig);
+    categories.value = response.data;
+    
+    // Si el modal está abierto y hay un producto, establecemos la categoría por defecto
+    if (props.visible && props.productToEdit) {
+      setDefaultCategory()
+    }
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+  } finally {
+    isLoadingCategories.value = false;
+  }
+};
+
+
 const updateProduct = async () => {
   try {
     const formData = new FormData()
@@ -86,7 +131,7 @@ const updateProduct = async () => {
     
     // API call for update
     const url = `${appsettings.apiUrl}/products/${props.productToEdit.id}`
-    const response = await fetch(url, {
+    const response = await axios.patch(url, {
       method: 'PATCH',
       body: formData
     })
@@ -105,6 +150,10 @@ const updateProduct = async () => {
     alert('Error al actualizar el producto')
   }
 }
+
+onMounted(() => {
+  fetchCategories();
+});
 </script>
 
 <template>
@@ -160,21 +209,25 @@ const updateProduct = async () => {
 
         <!-- Categoría -->
         <div class="form-group">
-          <label class="label">Categoría *</label>
-          <select 
-            v-model="productForm.category"
-            class="input"
-            required
-          >
-            <option value="">Selecciona una categoría</option>
-            <option value="Electrónica">Electrónica</option>
-            <option value="Ropa">Ropa</option>
-            <option value="Hogar">Hogar</option>
-            <option value="Deportes">Deportes</option>
-            <option value="Libros">Libros</option>
-            <option value="Otros">Otros</option>
-          </select>
-        </div>
+    <label class="label">Categoría *</label>
+    <select 
+      v-model="productForm.category"
+      class="input"
+      required
+      :disabled="isLoadingCategories"
+    >
+      <option value="">
+        {{ isLoadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría' }}
+      </option>
+      <option
+        v-for="category in categories"
+        :key="category.id"
+        :value="category.title || category.name" 
+      >
+        {{ category.title || category.name }}
+      </option>
+    </select>
+  </div>
 
         <!-- Estado Activo -->
         <div class="form-group">

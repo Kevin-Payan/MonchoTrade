@@ -1,25 +1,27 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <header class="bg-white shadow">
-      <div class="container mx-auto px-4 py-6">
-        <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-gray-900">Mis Productos para Intercambio</h1>
-        </div>
+    <header class="bg-white shadow relative">
+      <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Mis Productos para Intercambio</h1>
         
-        <div>
-          <button 
-            @click="openAddProductCreateModal"
-            class="px-4 py-2 bg-black text-white rounded-md"
-          >
-            Add Product
-          </button>
-          
-          <ProductCreateModal 
-            :visible="showProductCreateModal"
-            @close="showProductCreateModal = false"
-            @product-created="handleProductCreated"
-          />
+        <!-- Profile Dropdown -->
+        <div class="absolute top-4 right-4">
+          <ProfileDropdown />
         </div>
+      </div>
+      
+      <div>
+        <button 
+          @click="openAddProductCreateModal"
+          class="px-4 py-2 bg-black text-white rounded-md"
+        >
+          Add Product
+        </button>
+        <ProductCreateModal 
+          :visible="showProductCreateModal"
+          @close="showProductCreateModal = false"
+          @product-created="handleProductCreated"
+        />
       </div>
     </header>
 
@@ -113,6 +115,8 @@ import { appsettings } from '../../settings/appsettings'
 import ProductCreateModal from '@/components/ProductCreateModal.vue'
 import ProductEditModal from '@/components/ProductEditModal.vue'
 import ProductDetailsModal from '@/components/ProductDetailsModal.vue'
+import ProfileDropdown from '@/components/ProfileDropdown.vue'
+
 //Create Modal
 const showProductCreateModal = ref(false)
 

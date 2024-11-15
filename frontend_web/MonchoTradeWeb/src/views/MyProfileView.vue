@@ -5,6 +5,11 @@
       <div class="container mx-auto px-4 py-6">
         <div class="flex justify-between items-center">
           <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
+          <!-- Profile Dropdown -->
+          <div class="absolute top-4 right-4">
+            <ProfileDropdown />
+          </div>
+          
           <div class="flex gap-4">
             <button class="btn-secondary">
               <i class="fas fa-cog mr-2"></i>
@@ -155,6 +160,9 @@
 import { ref, onMounted } from 'vue'
 import { appsettings } from "../../settings/appsettings";
 import axios from 'axios';
+import ProfileDropdown from '@/components/ProfileDropdown.vue';
+
+
   const axiosConfig = {
   headers: {
     "Content-Type": "application/json",

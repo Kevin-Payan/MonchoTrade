@@ -3,5 +3,13 @@ export const appsettings = {
     sessionRoute : '/session',
     profileImageRoute: '/profileimage', 
     productRoute: '/product',
-    userRoute: '/user'
+    userRoute: '/user',
+    categoriesRoute: '/categories', 
+    axiosConfig: {
+        headers: {
+          "Content-Type": "application/json",
+        },
+    },
+      
+
 }
