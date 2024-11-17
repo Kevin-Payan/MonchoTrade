@@ -4,14 +4,12 @@
     <header class="bg-white shadow">
       <div class="container mx-auto px-4 py-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
-          
           <h1 class="text-2xl font-bold text-gray-900">Mis Intercambios</h1>
           
           <!-- Profile Dropdown -->
-        <div class="absolute top-4 right-4">
-          <ProfileDropdown />
-        </div>
+          <div class="absolute top-4 right-4">
+            <ProfileDropdown />
+          </div>
 
           <!-- Filtros y Búsqueda -->
           <div class="flex flex-wrap gap-4 items-center">
@@ -32,9 +30,6 @@
               <option value="Completed">Completados</option>
               <option value="Rejected">Rechazados</option>
             </select>
-
-
-
           </div>
         </div>
       </div>
@@ -42,18 +37,17 @@
 
     <!-- Contenido Principal -->
     <main class="container mx-auto px-4 py-8">
-      <!-- Lista de Intercambios -->
       <div class="bg-white rounded-lg shadow">
-        <!-- Tabs -->
+        <!-- Vista Tabs -->
         <div class="border-b border-gray-200">
           <nav class="flex -mb-px">
             <button 
-              v-for="tab in tabs" 
+              v-for="tab in viewTabs" 
               :key="tab.value"
-              @click="currentTab = tab.value"
+              @click="currentView = tab.value"
               :class="[
                 'px-6 py-4 text-sm font-medium whitespace-nowrap',
-                currentTab === tab.value
+                currentView === tab.value
                   ? 'border-b-2 border-blue-500 text-blue-600'
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
               ]"
@@ -132,12 +126,12 @@
       </div>
     </main>
 
-    <!-- Modal de Detalles -->
-    <div v-if="selectedExchange" class="modal-backdrop">
+    <!-- Modal de Detalles para Propuestas -->
+    <div v-if="selectedExchange && isInitiator(selectedExchange)" class="modal-backdrop">
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="text-lg font-medium">
-            Detalles del Intercambio #{{ selectedExchange.id }}
+            Detalles de la Propuesta #{{ selectedExchange.id }}
           </h3>
           <button @click="selectedExchange = null" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times"></i>
@@ -145,31 +139,127 @@
         </div>
         <div class="p-6">
           <div class="space-y-4">
-            <div>
-              <h4 class="font-medium">Productos</h4>
-              <p>{{ selectedExchange.initiatorProductName }} por {{ selectedExchange.receiverProductName }}</p>
+            <!-- Detalles del intercambio -->
+            <div class="space-y-4">
+              <div>
+                <h4 class="font-medium">Productos</h4>
+                <p>{{ selectedExchange.initiatorProductName }} por {{ selectedExchange.receiverProductName }}</p>
+              </div>
+              <div>
+                <h4 class="font-medium">Usuarios</h4>
+                <p>Iniciador: {{ selectedExchange.initiatorUserName }}</p>
+                <p>Receptor: {{ selectedExchange.receiverUserName }}</p>
+              </div>
+              <div>
+                <h4 class="font-medium">Estado</h4>
+                <p>{{ statusLabels[selectedExchange.status] }}</p>
+              </div>
+              <div v-if="selectedExchange.notes">
+                <h4 class="font-medium">Notas</h4>
+                <p>{{ selectedExchange.notes }}</p>
+              </div>
             </div>
-            <div>
-              <h4 class="font-medium">Usuarios</h4>
-              <p>Iniciador: {{ selectedExchange.initiatorUserName }}</p>
-              <p>Receptor: {{ selectedExchange.receiverUserName }}</p>
+            
+            <div v-if="selectedExchange.status === 'Accepted'">
+              <h4 class="font-medium">Contact Information</h4>
+              <div v-if="contactInfo">
+                <p><strong>Email:</strong> {{ contactInfo.email }}</p>
+                <p><strong>Phone:</strong> {{ contactInfo.phoneNumber }}</p>
+              </div>
+              <div v-else class="text-gray-500">
+                Loading contact information...
+              </div>
             </div>
-            <div>
-              <h4 class="font-medium">Estado</h4>
-              <p>{{ statusLabels[selectedExchange.status] }}</p>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-end space-x-3 mt-6">
+              <button 
+                v-if="selectedExchange.status !== 'Completed' && selectedExchange.status !== 'Rejected'"
+                @click="updateExchangeStatus('Completed')"
+                class="btn bg-green-500 text-white hover:bg-green-600"
+              >
+                Marcar como Completado
+              </button>
+              <button 
+                v-if="selectedExchange.status === 'Pending'"
+                @click="updateExchangeStatus('Rejected')"
+                class="btn bg-red-500 text-white hover:bg-red-600"
+              >
+                Cancelar Propuesta
+              </button>
             </div>
-            <div v-if="selectedExchange.rejectionReason">
-              <h4 class="font-medium">Razón de Rechazo</h4>
-              <p>{{ selectedExchange.rejectionReason }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalles para Solicitudes -->
+    <div v-if="selectedExchange && !isInitiator(selectedExchange)" class="modal-backdrop">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="text-lg font-medium">
+            Detalles de la Solicitud #{{ selectedExchange.id }}
+          </h3>
+          <button @click="selectedExchange = null" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <!-- Detalles del intercambio -->
+            <div class="space-y-4">
+              <div>
+                <h4 class="font-medium">Productos</h4>
+                <p>{{ selectedExchange.initiatorProductName }} por {{ selectedExchange.receiverProductName }}</p>
+              </div>
+              <div>
+                <h4 class="font-medium">Usuarios</h4>
+                <p>Iniciador: {{ selectedExchange.initiatorUserName }}</p>
+                <p>Receptor: {{ selectedExchange.receiverUserName }}</p>
+              </div>
+              <div>
+                <h4 class="font-medium">Estado</h4>
+                <p>{{ statusLabels[selectedExchange.status] }}</p>
+              </div>
+              <div v-if="selectedExchange.notes">
+                <h4 class="font-medium">Notas</h4>
+                <p>{{ selectedExchange.notes }}</p>
+              </div>
             </div>
-            <div v-if="selectedExchange.notes">
-              <h4 class="font-medium">Notas</h4>
-              <p>{{ selectedExchange.notes }}</p>
+            
+            <div v-if="selectedExchange.status === 'Accepted'">
+              <h4 class="font-medium">Contact Information</h4>
+              <div v-if="contactInfo">
+                <p><strong>Email:</strong> {{ contactInfo.email }}</p>
+                <p><strong>Phone:</strong> {{ contactInfo.phoneNumber }}</p>
+              </div>
+              <div v-else class="text-gray-500">
+                Loading contact information...
+              </div>
             </div>
-            <div>
-              <h4 class="font-medium">Fechas</h4>
-              <p>Creado: {{ formatDate(selectedExchange.createdAt) }}</p>
-              <p>Actualizado: {{ formatDate(selectedExchange.updatedAt) }}</p>
+            <!-- Botones de acción -->
+            <div class="flex justify-end space-x-3 mt-6">
+              <button 
+                v-if="selectedExchange.status === 'Pending'"
+                @click="updateExchangeStatus('Accepted')"
+                class="btn bg-blue-500 text-white hover:bg-blue-600"
+              >
+                Aceptar
+              </button>
+              <button 
+                v-if="selectedExchange.status !== 'Completed' && selectedExchange.status !== 'Rejected'"
+                @click="updateExchangeStatus('Completed')"
+                class="btn bg-green-500 text-white hover:bg-green-600"
+              >
+                Marcar como Completado
+              </button>
+              <button 
+                v-if="selectedExchange.status === 'Pending'"
+                @click="updateExchangeStatus('Rejected')"
+                class="btn bg-red-500 text-white hover:bg-red-600"
+              >
+                Rechazar
+              </button>
             </div>
           </div>
         </div>
@@ -179,7 +269,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch} from 'vue'
 import axios from 'axios'
 import { appsettings } from '../../settings/appsettings';
 import ProfileDropdown from '@/components/ProfileDropdown.vue';
@@ -187,17 +277,16 @@ import ProfileDropdown from '@/components/ProfileDropdown.vue';
 // Estado
 const searchQuery = ref('')
 const statusFilter = ref('')
-const currentTab = ref('all')
+const currentView = ref('all')
 const selectedExchange = ref(null)
 const exchanges = ref([])
+const contactInfo = ref(null)
 
 // Datos estáticos
-const tabs = [
-  { label: 'Todos', value: 'all' },
-  { label: 'Pendientes', value: 'Pending' },
-  { label: 'En Proceso', value: 'Accepted' },
-  { label: 'Completados', value: 'Completed' },
-  { label: 'Rechazados', value: 'Rejected' }
+const viewTabs = [
+  { label: 'Todos los Intercambios', value: 'all' },
+  { label: 'Mis Propuestas', value: 'proposals' },
+  { label: 'Peticiones', value: 'requests' }
 ]
 
 const statusLabels = {
@@ -217,7 +306,15 @@ const statusClasses = {
 // Computed
 const filteredExchanges = computed(() => {
   let filtered = [...exchanges.value]
-  console.log(exchanges.value)
+  
+  // Filtrar por vista actual
+  if (currentView.value === 'proposals') {
+    filtered = filtered.filter(e => isInitiator(e))
+  } else if (currentView.value === 'requests') {
+    filtered = filtered.filter(e => !isInitiator(e))
+  }
+
+  // Aplicar filtros adicionales
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(e => 
@@ -231,10 +328,6 @@ const filteredExchanges = computed(() => {
     filtered = filtered.filter(e => e.status === statusFilter.value)
   }
 
-  if (currentTab.value !== 'all') {
-    filtered = filtered.filter(e => e.status === currentTab.value)
-  }
-
   return filtered
 })
 
@@ -245,18 +338,108 @@ const formatDate = (date) => {
 
 const viewExchange = (exchange) => {
   selectedExchange.value = exchange
+  // Reset contact info when opening a new exchange
+  contactInfo.value = null
+  // Fetch contact info if status is Accepted
+  if (exchange.status === 'Accepted') {
+    fetchContactInfo(exchange)
+  }
 }
 
-const getTabCount = (status) => {
-  if (status === 'all') {
+watch(
+  () => selectedExchange.value?.status,
+  (newStatus) => {
+    if (newStatus === 'Accepted' && selectedExchange.value) {
+      fetchContactInfo(selectedExchange.value)
+    } else {
+      contactInfo.value = null
+    }
+  }
+)
+
+
+const getTabCount = (value) => {
+  if (value === 'all') {
     return exchanges.value.length
   }
-  return exchanges.value.filter(e => e.status === status).length
+  if (value === 'proposals') {
+    return exchanges.value.filter(e => isInitiator(e)).length
+  }
+  if (value === 'requests') {
+    return exchanges.value.filter(e => !isInitiator(e)).length
+  }
+  return 0
 }
 
 const isInitiator = (exchange) => {
   const userId = localStorage.getItem('userId')
   return exchange.initiatorUserId.toString() === userId
+}
+
+// Function to get the other user's ID
+const getOtherUserId = (exchange) => {
+  const currentUserId = localStorage.getItem('userId')
+  return exchange.initiatorUserId.toString() === currentUserId 
+    ? exchange.receiverUserId 
+    : exchange.initiatorUserId
+
+}
+
+// Function to fetch contact information
+const fetchContactInfo = async (exchange) => {
+  if (!exchange || exchange.status !== 'Accepted') return
+
+  try {
+    const otherUserId = getOtherUserId(exchange)
+    const response = await axios.get(
+      `${appsettings.apiUrl}/user/contactinfo/${otherUserId}`,
+      appsettings.axiosConfig
+    )
+    contactInfo.value = {
+      email: response.data.email,
+      phoneNumber: response.data.phoneNumber
+    }
+  } catch (error) {
+    console.error('Error fetching contact information:', error)
+    contactInfo.value = null
+  }
+}
+
+
+
+
+const updateExchangeStatus = async (newStatus) => {
+  try {
+    const patchDoc = [
+      {
+        op: 'replace',
+        path: '/status',
+        value: newStatus
+      }
+    ]
+
+    await axios.patch(
+      `${appsettings.apiUrl}/exchanges/${selectedExchange.value.id}`,
+      patchDoc,
+      {
+        headers: {
+          'Content-Type': 'application/json-patch+json'
+        }
+      }
+    )
+
+    // Actualizar el estado local
+    selectedExchange.value.status = newStatus
+    const exchangeIndex = exchanges.value.findIndex(e => e.id === selectedExchange.value.id)
+    if (exchangeIndex !== -1) {
+      exchanges.value[exchangeIndex].status = newStatus
+    }
+
+    // Opcional: cerrar el modal después de la actualización
+    // selectedExchange.value = null
+  } catch (error) {
+    console.error('Error updating exchange status:', error)
+  }
 }
 
 // Fetch data
@@ -269,6 +452,8 @@ const fetchExchanges = async () => {
     console.error('Error fetching exchanges:', error)
   }
 }
+
+
 
 // Lifecycle
 onMounted(() => {
@@ -304,5 +489,10 @@ onMounted(() => {
 
 .modal-header {
   @apply flex justify-between items-center p-6 border-b border-gray-200;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-md font-medium transition-colors duration-200
+         disabled:opacity-50 disabled:cursor-not-allowed;
 }
 </style>
