@@ -4,6 +4,7 @@ export const appsettings = {
     profileImageRoute: '/profileimage', 
     productImageRoute: '/productimage', 
     productRoute: '/product',
+    exchangeRoute: '/exchanges', 
     userRoute: '/user',
     categoriesRoute: '/categories', 
     axiosConfig: {

@@ -1,11 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
+    <!-- Previous template code remains unchanged until the handleImageUpload function -->
     <header class="bg-white shadow">
       <div class="container mx-auto px-4 py-6">
         <div class="flex justify-between items-center">
           <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
-          <!-- Profile Dropdown -->
           <div class="absolute top-4 right-4">
             <ProfileDropdown />
           </div>
@@ -50,14 +49,17 @@
                 <button 
                   @click="handleImageUpload"
                   class="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full"
+                  :disabled="imageUploading"
                 >
-                  <i class="fas fa-camera"></i>
+                  <i v-if="!imageUploading" class="fas fa-camera"></i>
+                  <i v-else class="fas fa-spinner animate-spin"></i>
                 </button>
               </div>
               <h2 class="mt-4 text-xl font-semibold">{{ userProfile.name }} {{ userProfile.lastName }}</h2>
               <p class="text-gray-600">{{ userProfile.secondLastName }}</p>
             </div>
 
+            <!-- Rest of the template remains the same -->
             <!-- Contact Information -->
             <div class="mt-6 space-y-4">
               <div class="flex items-center">
@@ -158,30 +160,31 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { appsettings } from "../../settings/appsettings";
-import axios from 'axios';
-import ProfileDropdown from '@/components/ProfileDropdown.vue';
+import { appsettings } from "../../settings/appsettings"
+import axios from 'axios'
+import ProfileDropdown from '@/components/ProfileDropdown.vue'
 
-
-  const axiosConfig = {
+const axiosConfig = {
   headers: {
     "Content-Type": "application/json",
   },
-  };
+}
 
-  const axiosPatchConfig = {
-    headers: {
+const axiosPatchConfig = {
+  headers: {
     "Content-Type": 'application/json-patch+json',
   },
-  }
+}
 
 // State
 const userProfile = ref({})
 const formData = ref({})
 const loading = ref(false)
 const error = ref(null)
-const storedId = parseInt(localStorage.getItem("userId"), 10);
+const imageUploading = ref(false)
+const storedId = parseInt(localStorage.getItem("userId"), 10)
 const profilePic = ref('')
+
 // Get user profile on component mount
 onMounted(async () => {
   await fetchUserProfile()
@@ -193,10 +196,10 @@ const fetchUserProfile = async () => {
   error.value = null
   
   try {
-    const response = await axios.get(`${appsettings.apiUrl}/user/${storedId}`,axiosConfig) // Replace 1 with actual user ID
+    const response = await axios.get(`${appsettings.apiUrl}/user/${storedId}`, axiosConfig)
     userProfile.value = response.data
     profilePic.value = `${appsettings.apiUrl}/uploads/profiles/${userProfile.value.profileImageUrl || 'default.jpg'}`
-    console.log(profilePic)
+    
     // Initialize form data with current values
     formData.value = {
       name: response.data.name,
@@ -214,33 +217,64 @@ const fetchUserProfile = async () => {
 }
 
 const handleImageUpload = () => {
-  // Profile image upload logic
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
+  
   input.onchange = async (event) => {
     const file = event.target.files[0]
-    if (file) {
-      const formData = new FormData()
-      formData.append('image', file)
-      
-      try {
-        loading.value = true
-        const response = await axios.put(`/user/${storedId}/profile-image`, formData, {
+    if (!file) return
+
+    // Check file size (1MB = 1 * 1024 * 1024 bytes)
+    if (file.size > 1 * 1024 * 1024) {
+      error.value = 'File size should not exceed 1 MB'
+      return
+    }
+
+    // Check file extension
+    const allowedExtensions = [".jpg", ".jpeg", ".png", ".jfif"]
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
+    if (!allowedExtensions.includes(fileExtension)) {
+      error.value = 'Only .jpg, .jpeg, .jfif and .png files are allowed'
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('Id', storedId)
+    formData.append('UserId', storedId) // Adding UserId as required by DTO
+    formData.append('ProfileImageUrl', userProfile.value.profileImageUrl || '') // Adding current ProfileImageUrl
+    formData.append('ImageFile', file)
+    
+    imageUploading.value = true
+    error.value = null
+
+    try {
+      const response = await axios.put(
+        `${appsettings.apiUrl}${appsettings.profileImageRoute}/${storedId}`,
+        formData,
+        {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
-        })
-        userProfile.value.profileImage = response.data
-      } catch (err) {
-        error.value = err.response?.data?.error || 'Error uploading image'
-      } finally {
-        loading.value = false
+        }
+      )
+
+      // Update profile picture URL
+      if (response.data && response.data.url) {
+        profilePic.value = `${appsettings.apiUrl}/uploads/profiles/${response.data.url}`
+        userProfile.value.profileImageUrl = response.data.url
       }
+    } catch (err) {
+      error.value = err.response?.data || 'Error uploading image'
+      console.error('Error uploading image:', err)
+    } finally {
+      imageUploading.value = false
     }
   }
+
   input.click()
 }
+
 
 const updateProfile = async () => {
   loading.value = true
@@ -279,13 +313,9 @@ const updateProfile = async () => {
   loading.value = false
 }
 
-// More efficient reset using Object.assign or spread operator
 const resetForm = () => {
   formData.value = { ...userProfile.value }
-  // Or alternatively:
-  // formData.value = Object.assign({}, userProfile.value)
 }
-
 </script>
 
 <style scoped>

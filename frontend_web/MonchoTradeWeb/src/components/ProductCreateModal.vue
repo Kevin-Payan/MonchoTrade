@@ -89,23 +89,24 @@ const saveProduct = async () => {
         }
       }
     );
-    
-    console.log(formData)
-    if (!response.ok) {
-      throw new Error('Error creating product')
+
+  // Optional: Check specific status code
+  if (response.status !== 201 && response.status !== 200) {
+      throw new Error(`Unexpected status code: ${response.status}`)
     }
     
-    // Emit event after successful creation
     emit('product-created')
-    
-    // Show success message
     alert('Producto creado exitosamente')
-    
     closeModal()
     
   } catch (error) {
-    console.error('Error saving product:', error)
-    alert('Error al crear el producto')
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error:', error.response?.data)
+      alert(`Error al crear el producto: ${error.response?.data?.message || error.message}`)
+    } else {
+      console.error('Error saving product:', error)
+      alert('Error al crear el producto')
+    }
   }
 }
 </script>
