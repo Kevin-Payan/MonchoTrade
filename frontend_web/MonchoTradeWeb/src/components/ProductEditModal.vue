@@ -1,12 +1,12 @@
 <script setup>
-import { ref, reactive, watch,onMounted  } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import { appsettings } from '../../settings/appsettings';
 import axios from 'axios';
 
 const props = defineProps({
   productToEdit: {
     type: Object,
-    required: true  // Este modal solo se muestra cuando hay un producto para editar
+    required: true
   },
   visible: {
     type: Boolean,
@@ -14,37 +14,30 @@ const props = defineProps({
   }
 })
 
-
 const categories = ref([]);
 const isLoadingCategories = ref(false);
+const loading = ref(false);
+const error = ref(null);
 
 const emit = defineEmits(['close', 'product-updated'])
 
 // Form state
 const productForm = reactive({
-  name: '',
+  title: '',
   description: '',
   quantity: 0,
   category: '',
   isActive: true,
 })
 
-// Images state
-const selectedImages = ref([])
-
-// Watch for changes in productToEdit to populate form when modal opens
+// Watch for changes in productToEdit to populate form
 watch(() => props.visible, (newVal) => {
-
-  if (newVal && props.productToEdit) {  // Si el modal se abre y hay un producto para editar
-    productForm.name = props.productToEdit.title
+  if (newVal && props.productToEdit) {
+    productForm.title = props.productToEdit.title
     productForm.description = props.productToEdit.description
     productForm.quantity = props.productToEdit.quantity
     productForm.category = props.productToEdit.category
     productForm.isActive = props.productToEdit.isActive
-    selectedImages.value = props.productToEdit.imageUrl ? [{
-      preview: props.productToEdit.imageUrl,
-      isExisting: true
-    }] : []
 
     if (categories.value.length > 0) {
       setDefaultCategory()
@@ -52,42 +45,18 @@ watch(() => props.visible, (newVal) => {
   }
 })
 
-// Watch para cuando las categorías se cargan
 watch(() => categories.value, () => {
   if (props.visible && props.productToEdit && categories.value.length > 0) {
     setDefaultCategory()
   }
 })
 
-
-const handleImageUpload = (event) => {
-  const files = Array.from(event.target.files)
-  
-  files.forEach(file => {
-    if (file.type.startsWith('image/')) {
-      selectedImages.value.push({
-        file: file,
-        preview: URL.createObjectURL(file)
-      })
-    }
-  })
-}
-
-const removeImage = (index) => {
-  if (selectedImages.value[index].preview.startsWith('blob:')) {
-    URL.revokeObjectURL(selectedImages.value[index].preview)
-  }
-  selectedImages.value.splice(index, 1)
-}
-
 const closeModal = () => {
+  error.value = null
   emit('close')
 }
 
- // Función auxiliar para establecer la categoría por defecto
- const setDefaultCategory = () => {
-  console.log('Product category:', props.productToEdit.category)
-  console.log('Available categories:', categories.value.map(c => c.title || c.name))
+const setDefaultCategory = () => {
   if (props.productToEdit.category) {
     productForm.category = props.productToEdit.category
   }
@@ -96,10 +65,9 @@ const closeModal = () => {
 const fetchCategories = async () => {
   isLoadingCategories.value = true;
   try {
-    const response = await axios.get(`${appsettings.apiUrl}${appsettings.categoriesRoute}`, appsettings.axiosConfig);
+    const response = await axios.get(`${appsettings.apiUrl}${appsettings.categoriesRoute}`);
     categories.value = response.data;
     
-    // Si el modal está abierto y hay un producto, establecemos la categoría por defecto
     if (props.visible && props.productToEdit) {
       setDefaultCategory()
     }
@@ -110,44 +78,73 @@ const fetchCategories = async () => {
   }
 };
 
-
 const updateProduct = async () => {
+  loading.value = true
+  error.value = null
+  
   try {
-    const formData = new FormData()
+    const patchOperations = []
     
-    // Append product data
-    formData.append('name', productForm.name)
-    formData.append('description', productForm.description)
-    formData.append('quantity', productForm.quantity)
-    formData.append('category', productForm.category)
-    formData.append('isActive', productForm.isActive)
-    
-    // Append images
-    selectedImages.value.forEach((image, index) => {
-      if (!image.isExisting) {
-        formData.append(`images[${index}]`, image.file)
-      }
-    })
-    
-    // API call for update
-    const url = `${appsettings.apiUrl}/products/${props.productToEdit.id}`
-    const response = await axios.patch(url, {
-      method: 'PATCH',
-      body: formData
-    })
-    
-    if (!response.ok) {
-      throw new Error('Error updating product')
+    if (productForm.title !== props.productToEdit.title) {
+      patchOperations.push({
+        op: 'replace',
+        path: '/Title',
+        value: productForm.title
+      })
     }
     
-    // Emit update event
-    emit('product-updated')
-    alert('Producto actualizado exitosamente')
-    closeModal()
+    if (productForm.description !== props.productToEdit.description) {
+      patchOperations.push({
+        op: 'replace',
+        path: '/Description',
+        value: productForm.description
+      })
+    }
     
-  } catch (error) {
-    console.error('Error saving product:', error)
-    alert('Error al actualizar el producto')
+    if (productForm.quantity !== props.productToEdit.quantity) {
+      patchOperations.push({
+        op: 'replace',
+        path: '/Quantity',
+        value: productForm.quantity
+      })
+    }
+    
+    if (productForm.category !== props.productToEdit.category) {
+      patchOperations.push({
+        op: 'replace',
+        path: '/Category',
+        value: productForm.category
+      })
+    }
+    
+    if (productForm.isActive !== props.productToEdit.isActive) {
+      patchOperations.push({
+        op: 'replace',
+        path: '/IsActive',
+        value: productForm.isActive
+      })
+    }
+
+    if (patchOperations.length > 0) {
+      await axios.patch(
+        `${appsettings.apiUrl}${appsettings.productRoute}/${props.productToEdit.id}`,
+        patchOperations,
+        {
+          headers: {
+            'Content-Type': 'application/json-patch+json'
+          }
+        }
+      );
+      
+      emit('product-updated')
+      closeModal()
+    }
+    
+  } catch (err) {
+    error.value = err.response?.data?.error || 'Error updating product'
+    console.error('Error updating product:', err)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -168,11 +165,16 @@ onMounted(() => {
 
       <!-- Form content -->
       <form @submit.prevent="updateProduct" class="p-6 space-y-4">
+        <!-- Error Alert -->
+        <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+          {{ error }}
+        </div>
+
         <!-- Nombre -->
         <div class="form-group">
           <label class="label">Nombre del Producto *</label>
           <input 
-            v-model="productForm.name"
+            v-model="productForm.title"
             type="text" 
             class="input"
             required
@@ -209,25 +211,25 @@ onMounted(() => {
 
         <!-- Categoría -->
         <div class="form-group">
-    <label class="label">Categoría *</label>
-    <select 
-      v-model="productForm.category"
-      class="input"
-      required
-      :disabled="isLoadingCategories"
-    >
-      <option value="">
-        {{ isLoadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría' }}
-      </option>
-      <option
-        v-for="category in categories"
-        :key="category.id"
-        :value="category.title || category.name" 
-      >
-        {{ category.title || category.name }}
-      </option>
-    </select>
-  </div>
+          <label class="label">Categoría *</label>
+          <select 
+            v-model="productForm.category"
+            class="input"
+            required
+            :disabled="isLoadingCategories"
+          >
+            <option value="">
+              {{ isLoadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría' }}
+            </option>
+            <option
+              v-for="category in categories"
+              :key="category.id"
+              :value="category.title || category.name" 
+            >
+              {{ category.title || category.name }}
+            </option>
+          </select>
+        </div>
 
         <!-- Estado Activo -->
         <div class="form-group">
@@ -241,49 +243,21 @@ onMounted(() => {
           </label>
         </div>
 
-        <!-- Imágenes -->
-        <div class="form-group">
-          <label class="label">Imágenes</label>
-          <input 
-            type="file"
-            @change="handleImageUpload"
-            accept="image/*"
-            class="input"
-          >
-          <div v-if="selectedImages.length" class="mt-2 flex gap-2 flex-wrap">
-            <div 
-              v-for="(image, index) in selectedImages" 
-              :key="index"
-              class="relative w-20 h-20"
-            >
-              <img 
-                :src="image.preview"
-                class="w-full h-full object-cover rounded-lg"
-                alt="Preview"
-              >
-              <button 
-                @click="removeImage(index)"
-                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div class="flex justify-end gap-4">
           <button 
             type="button" 
             @click="closeModal" 
             class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+            :disabled="loading"
           >
             Cancelar
           </button>
           <button 
             type="submit" 
             class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+            :disabled="loading"
           >
+            <span v-if="loading" class="animate-spin mr-2">↻</span>
             Guardar Cambios
           </button>
         </div>

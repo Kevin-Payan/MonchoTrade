@@ -36,11 +36,11 @@
             <div class="flex items-center">
               <img 
                 :src="product.imageUrl || '/api/placeholder/100/100'"
-                :alt="product.name"
+                :alt="product.title"
                 class="w-16 h-16 rounded-lg object-cover"
               >
               <div class="ml-4">
-                <h3 class="font-medium text-gray-900">{{ product.name }}</h3>
+                <h3 class="font-medium text-gray-900">{{ product.title}}</h3>
                 <p class="text-sm text-gray-500 truncate">{{ product.description || 'Sin descripción' }}</p>
               </div>
             </div>
@@ -53,10 +53,10 @@
       :visible="showProductDetails"
       :product="selectedProduct"
       @close="closeProductDetails"
-      @edit="openEditProductModal(selectedProduct)"
-      @changeImage="handleChangeImage"
-      @delete="handleDelete"
-      @toggleStatus="handleToggleStatus"
+      @edit="openEditProductModal"
+      @change-image="handleChangeImage"
+      @product-deleted="handleDelete"
+      @toggle-status="handleToggleStatus"
     />
 
     <ProductEditModal
@@ -67,23 +67,57 @@
     />
 
     <!-- Modal para Actualizar Imagen -->
-    <div v-if="showUpdateImageModal" class="modal-backdrop">
+    <div v-if="showUpdateImageModal" class="modal-backdrop" @click.self="closeUpdateImageModal">
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="text-lg font-medium">Actualizar Imagen</h3>
-          <button @click="closeUpdateModal" class="text-gray-500 hover:text-gray-700">
-            <i class="fas fa-times"></i>
+          <button 
+            @click="closeUpdateImageModal" 
+            class="text-gray-500 hover:text-gray-700"
+            type="button"
+          >
+            <span class="text-xl">&times;</span>
           </button>
         </div>
+        
         <form @submit.prevent="updateProductImage" class="p-6 space-y-4">
+          <!-- Error Alert -->
+          <div v-if="imageError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            {{ imageError }}
+          </div>
+
+          <!-- Current Image -->
+          <div v-if="selectedProduct" class="mb-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Imagen Actual:</h4>
+            <img 
+              :src="selectedProduct.imageUrl || '/api/placeholder/100/100'"
+              :alt="selectedProduct.name"
+              class="max-w-xs max-h-48 object-contain rounded-lg border border-gray-200"
+            >
+          </div>
+
+          <!-- Image Upload -->
           <div class="form-group">
             <label class="label">Nueva Imagen</label>
             <input 
               type="file" 
               @change="handleImageUpload"
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png"
               class="input"
               required
+            >
+            <p class="text-sm text-gray-500 mt-1">
+              Máximo 1 MB. Formatos permitidos: JPG, JPEG, PNG
+            </p>
+          </div>
+
+          <!-- Image Preview -->
+          <div v-if="previewUrl" class="mt-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Vista previa:</h4>
+            <img 
+              :src="previewUrl"
+              class="max-w-xs max-h-48 object-contain rounded-lg border border-gray-200"
+              alt="Preview"
             >
           </div>
           
@@ -92,13 +126,16 @@
               type="button" 
               @click="closeUpdateImageModal" 
               class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              :disabled="imageLoading"
             >
               Cancelar
             </button>
             <button 
               type="submit" 
               class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+              :disabled="imageLoading || !selectedImage"
             >
+              <span v-if="imageLoading" class="animate-spin mr-2">↻</span>
               Guardar
             </button>
           </div>
@@ -109,7 +146,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { appsettings } from '../../settings/appsettings'
 import ProductCreateModal from '@/components/ProductCreateModal.vue'
@@ -117,31 +154,28 @@ import ProductEditModal from '@/components/ProductEditModal.vue'
 import ProductDetailsModal from '@/components/ProductDetailsModal.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
 
-//Create Modal
+// Create Modal
 const showProductCreateModal = ref(false)
 
-//Edit Modal
+// Edit Modal
 const showProductEditModal = ref(false)
-
-//Details Modal
-const showProductDetails = ref(false)
-
-//Images Modal
-const showUpdateImageModal = ref(false)
-
-//Details modal
-const selectedProduct = ref(null)
-
-//Edit Modal
 const productToEdit = ref(null)
 
-//Fetch products
+// Details Modal
+const showProductDetails = ref(false)
+const selectedProduct = ref(null)
+
+// Image Modal and related states
+const showUpdateImageModal = ref(false)
+const selectedImage = ref(null)
+const imageError = ref(null)
+const imageLoading = ref(false)
+const previewUrl = ref(null)
+
+// Products data
 const products = ref([])
 
-// Cargar productos al montar el componente
-
-
-
+// Fetch products
 const fetchProducts = async () => {
   try {
     const userId = localStorage.getItem('userId')
@@ -152,36 +186,51 @@ const fetchProducts = async () => {
   }
 }
 
+// Modal handlers
 const openAddProductCreateModal = () => {
   showProductCreateModal.value = true
 }
 
+const openEditProductModal = (product) => {
+  productToEdit.value = product
+  showProductEditModal.value = true
+}
+
 const openProductDetails = (product) => {
-  selectedProduct.value = product
-  showProductDetails.value = true
+  if (product) {
+    selectedProduct.value = { ...product } // Create a copy of the product
+    showProductDetails.value = true
+  }
 }
 
 const closeProductDetails = () => {
   showProductDetails.value = false
-  selectedProduct.value = null
+  setTimeout(() => {
+    selectedProduct.value = null
+  }, 200) // Clear after animation
 }
 
-const openEditProductModal = (product) => {
-  productToEdit.value = product
-  console.log(productToEdit.value)
-  showProductEditModal.value = true
+const handleChangeImage = (product) => {
+  if (product) {
+    selectedProduct.value = { ...product }
+    showUpdateImageModal.value = true
+    // Reset image-related states
+    selectedImage.value = null
+    previewUrl.value = null
+    imageError.value = null
+  }
 }
 
-const handleProductCreated = (product) => {
+const handleDelete = () => {
+  fetchProducts()
+  showProductDetails.value = false
+  setTimeout(() => {
+    selectedProduct.value = null
+  }, 200)
+}
 
-  console.log(product)
-
-  /*
-  try{
-    await axios.post(`${appsettings.apiUrl}${appsettings.productRoute}`, product); 
-  }catch(error){
-
-  }*/
+// Product handlers
+const handleProductCreated = () => {
   fetchProducts()
 }
 
@@ -189,23 +238,7 @@ const handleProductUpdated = () => {
   fetchProducts()
 }
 
-const handleChangeImage = (product) => {
-  selectedProduct.value = product
-  showUpdateImageModal.value = true
-  closeProductDetails()
-}
 
-const handleDelete = async (product) => {
-  if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-    try {
-      await axios.delete(`${appsettings.apiUrl}/products/${product.id}`)
-      fetchProducts()
-      closeProductDetails()
-    } catch (error) {
-      console.error('Error deleting product:', error)
-    }
-  }
-}
 
 const handleToggleStatus = async (product) => {
   try {
@@ -218,39 +251,98 @@ const handleToggleStatus = async (product) => {
   }
 }
 
-//Imagen Modal
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0]
-  if (file) {
-    const imageUrl = URL.createObjectURL(file)
-    if (selectedProduct.value) {
-      selectedProduct.value.imageUrl = imageUrl
-    } else {
-      productForm.value.imageUrl = imageUrl
-    }
+  if (!file) return
+
+  // Reset previous states
+  imageError.value = null
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
   }
+
+  // Validate file size (1MB)
+  if (file.size > 1 * 1024 * 1024) {
+    imageError.value = "El archivo no debe exceder 1 MB"
+    event.target.value = ''
+    return
+  }
+
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!allowedTypes.includes(file.type)) {
+    imageError.value = "Solo se permiten archivos JPG, JPEG y PNG"
+    event.target.value = ''
+    return
+  }
+
+  selectedImage.value = file
+  previewUrl.value = URL.createObjectURL(file)
 }
 
 const closeUpdateImageModal = () => {
+  // Cleanup and reset all related states
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
   showUpdateImageModal.value = false
   selectedProduct.value = null
+  selectedImage.value = null
+  previewUrl.value = null
+  imageError.value = null
 }
 
+const getFileNameFromUrl = (url) => {
+  if (!url) return '';
+  return url.split('/').pop(); // Gets the last part after the last '/'
+}
 const updateProductImage = async () => {
+  if (!selectedImage.value || !selectedProduct.value) {
+    imageError.value = "Por favor selecciona una imagen"
+    return
+  }
+
+  imageLoading.value = true
+  imageError.value = null
+
   try {
-    await axios.patch(`/api/products/${selectedProduct.value.id}`, {
-      imageUrl: selectedProduct.value.imageUrl
-    })
-    fetchProducts()
+    const currentImageFileName = getFileNameFromUrl(selectedProduct.value.imageUrl)
+    const formData = new FormData()
+    formData.append('Id', selectedProduct.value.id)
+    formData.append('ProductId', selectedProduct.value.id)
+    formData.append('ImageUrl', currentImageFileName || '')
+    formData.append('ImageFile', selectedImage.value)
+
+    await axios.put(
+      `${appsettings.apiUrl}${appsettings.productImageRoute}/${selectedProduct.value.id}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    )
+
+    await fetchProducts()
     closeUpdateImageModal()
   } catch (error) {
     console.error('Error updating product image:', error)
+    imageError.value = error.response?.data?.message || 'Error al actualizar la imagen'
+  } finally {
+    imageLoading.value = false
   }
 }
 
+// Lifecycle hooks
 onMounted(() => {
   fetchProducts()
+})
+
+onBeforeUnmount(() => {
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
 })
 </script>
 
