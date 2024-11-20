@@ -38,11 +38,11 @@ const profileImage = ref('');
 const route = useRoute(); // Usamos `useRoute` para acceder a la ruta actual
 
 const menuItems = [
-    { label: 'Home', route: '/' },
+    { label: 'Home', route: '/home' },
     { label: 'My Profile', route: '/my-profile' },
     { label: 'My Products', route: '/my-products' },
     { label: 'My Exchanges', route: '/my-exchanges' },
-    { label: 'Logout', route: '/login' }
+    { label: 'Logout', route: '/' }
 ];
 
 // Filtra los elementos del menú dinámicamente según la ruta actual

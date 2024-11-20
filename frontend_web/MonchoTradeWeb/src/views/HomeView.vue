@@ -84,7 +84,7 @@ const handleSearch = (query) => {
   <main>
     <div>
       <Navbar />
-      <SearchBar @search="handleSearch" />
+     <!-- <SearchBar @search="handleSearch" /> -->
       <FeaturedItems 
         :items="featuredItems" 
         :current-page="currentPage"
@@ -95,8 +95,6 @@ const handleSearch = (query) => {
         :end-index="endIndex"
         @page-change="handlePageChange"
       />
-
-      <!-- Pagination Controls -->
       <div class="mt-8 flex items-center justify-between max-w-7xl mx-auto px-4">
         <div class="text-sm text-gray-700">
           Showing {{ startIndex }} - {{ endIndex }} of {{ totalItems }} items

@@ -35,7 +35,7 @@ const handleSubmit = async () => {
       console.error("No user ID returned from server");
     }
 
-    router.push("/"); // Adjust this route as needed
+    router.push("/home"); // Adjust this route as needed
   } catch (error) {
     if (error.response) {
       errorMessage.value =
@@ -64,23 +64,37 @@ const handleSubmit = async () => {
 
     <label for="password">Password</label>
     <input id="password" type="password" v-model="password" required /><br />
+    
+    <!--- 
     <div class="flex justify-start mb-3">
       <label class="flex items-center">
         <input type="checkbox" class="w-4 h-4 m-1" />
         <p class="">Remember Me</p>
       </label>
     </div>
+    --->
+    
     <button type="submit">Log in</button>
+  
+    <!--- 
     <h2 class="text-center text-gray-500 text-xs p-3">OR CONTINUE WITH</h2>
     <button class="google-button">
       <EnvelopeIcon class="size-6 m-2" />Google
     </button>
+    --->
     <p class="text-sm flex justify-center p-2">
-      Don't have an account?<span class="underline ml-1">Sign up</span>
+      Don't have an account?<span class="underline ml-1">
+      <router-link to="/signup" class="text-blue-500 hover:text-blue-700">
+        Sign up
+      </router-link>
+      </span>
     </p>
+    
+    <!--- 
     <p class="text-sm flex justify-center underline p-2">
       Forgot your password?
     </p>
+    --->
   </form>
 </template>
 

@@ -8,7 +8,8 @@
           <div class="absolute top-4 right-4">
             <ProfileDropdown />
           </div>
-          
+         
+          <!-- 
           <div class="flex gap-4">
             <button class="btn-secondary">
               <i class="fas fa-cog mr-2"></i>
@@ -19,6 +20,8 @@
               Logout
             </button>
           </div>
+          -->
+
         </div>
       </div>
     </header>
