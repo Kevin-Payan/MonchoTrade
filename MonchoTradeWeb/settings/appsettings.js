@@ -1,15 +1,8 @@
 export const appsettings = {
-<<<<<<< Updated upstream
-    apiUrl : 'http://localhost:5121',
-=======
     apiUrl : 'https://webapp-monchotrade-cbbee3h5chdhf5d3.centralus-01.azurewebsites.net',
->>>>>>> Stashed changes
     sessionRoute : '/session',
     profileImageRoute: '/profileimage', 
     productRoute: '/product',
-<<<<<<< Updated upstream
-}
-=======
     exchangeRoute: '/exchanges', 
     userRoute: '/user',
     categoriesRoute: '/categories', 
@@ -31,8 +24,4 @@ export const appsettings = {
       },
       withCredentials: true
     },
-    
-      
-
 }
->>>>>>> Stashed changes
