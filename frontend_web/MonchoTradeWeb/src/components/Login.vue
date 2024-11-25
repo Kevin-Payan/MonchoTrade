@@ -9,11 +9,6 @@ const password = ref("");
 const errorMessage = ref("");
 const router = useRouter(); // Instantiate router
 
-const axiosConfig = {
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
 
 const handleSubmit = async () => {
   errorMessage.value = "";
@@ -24,7 +19,7 @@ const handleSubmit = async () => {
         email: email.value,
         password: password.value,
       },
-      axiosConfig
+      appsettings.axiosConfig
     );
     console.log("Login successful:", response.data);
 
