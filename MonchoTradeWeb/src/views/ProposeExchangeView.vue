@@ -159,7 +159,7 @@ const YourId = parseInt(localStorage.getItem("userId"), 10)
 const fetchSelectedItem = async () => {
   try {
     const response = await axios.get(
-      `${appsettings.apiUrl}${appsettings.productRoute}/${ItemYouWant}`,appsettings.axiosConfig)
+      `${appsettings.apiUrl}${appsettings.productRoute}/${ItemYouWant}`, appsettings.axiosConfig)
     selectedItem.value = {
       ...response.data,
       imageUrl: appsettings.apiUrl + "/uploads/products/" + (response.data.imageUrl || '/default.jpg')
@@ -172,10 +172,10 @@ const fetchSelectedItem = async () => {
 const fetchMyItems = async () => {
   try {
     const response = await axios.get(
-      `${appsettings.apiUrl}${appsettings.userRoute}/products/${YourId}`,appsettings.axiosConfig)
+      `${appsettings.apiUrl}${appsettings.userRoute}/products/${YourId}`, appsettings.axiosConfig)
     myItems.value = response.data.map(item => ({
       ...item,
-      imageUrl: (item.imageUrl || `${appsettings.apiUrl}/uploads/products/default.jpg`)
+      imageUrl: ( `${appsettings.apiUrl}${item.imageUrl}`|| `${appsettings.apiUrl}/uploads/products/default.jpg`)
     }))
   } catch (error) {
     console.error('Error fetching my items:', error)
@@ -184,6 +184,7 @@ const fetchMyItems = async () => {
 
 const submitProposal = async () => {
   if (!isFormValid.value) return
+
   try {
     const proposal = {
       initiatorUserId: YourId,
@@ -193,7 +194,8 @@ const submitProposal = async () => {
     }
     console.log(proposal);
     await axios.put(
-      `${appsettings.apiUrl}${appsettings.exchangeRoute}`, proposal, appsettings.axiosConfig)
+      `${appsettings.apiUrl}${appsettings.exchangeRoute}`,
+      proposal, appsettings.axiosConfig)
 
     router.push('/my-exchanges')
   } catch (error) {

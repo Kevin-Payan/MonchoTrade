@@ -1,5 +1,5 @@
 export const appsettings = {
-    apiUrl : 'https://webapp-monchotrade-cbbee3h5chdhf5d3.centralus-01.azurewebsites.net',
+    apiUrl : 'https://localhost:7001',
     sessionRoute : '/session',
     profileImageRoute: '/profileimage', 
     productRoute: '/product',

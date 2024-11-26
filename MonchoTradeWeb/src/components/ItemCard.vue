@@ -1,6 +1,6 @@
- <!-- components/ItemCard.vue -->
- <template>
-  <div 
+<!-- components/ItemCard.vue -->
+<template>
+  <div
     class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
     :class="{ 'animate-pulse': loading }"
   >
@@ -10,7 +10,7 @@
     <!-- Image Container -->
     <div class="aspect-video relative bg-gray-100 overflow-hidden">
       <img
-        v-if="imageUrl"
+        v-if="imageUrl && !imageError"
         :src="imageUrl"
         :alt="title"
         class="w-full h-full object-cover transition-opacity duration-300"
@@ -46,27 +46,31 @@
       <p v-if="description" class="text-gray-600 text-sm">
         {{ description }}
       </p>
-      
+
+      <div class="text-sm text-gray-600">
+        Category: <span class="font-medium">{{ category }}</span>
+      </div>
+
       <div class="text-sm text-gray-600">
         Offered by: <span class="font-medium">{{ offeredBy }}</span>
       </div>
 
       <!-- Exchange Button -->
       <button
-        @click="$emit('propose-exchange')"
+        @click="handleProposeExchange"
         class="w-full bg-black text-white py-2 px-4 rounded-md flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="loading"
       >
-        <svg 
-          class="w-4 h-4" 
-          viewBox="0 0 24 24" 
-          fill="none" 
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
           stroke="currentColor"
         >
-          <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
             d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
           />
         </svg>
@@ -77,9 +81,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
+  id:{
+    type: Number,
+    required: true
+  },
   title: {
     type: String,
     required: true
@@ -95,20 +106,31 @@ const props = defineProps({
   description: {
     type: String,
     default: ''
+  },
+  category: {
+    type: String, 
+    default: ''
   }
-})
+});
 
-const emit = defineEmits(['propose-exchange'])
+const emit = defineEmits(['propose-exchange']);
 
-const loading = ref(true)
-const imageError = ref(false)
+const loading = ref(true);
+const imageError = ref(false);
 
 const handleImageLoad = () => {
-  loading.value = false
-}
+  loading.value = false;
+};
 
 const handleImageError = () => {
-  loading.value = false
-  imageError.value = true
-}
+  loading.value = false;
+  imageError.value = true;
+};
+
+const handleProposeExchange = () => {
+  console.log(props.id)
+  localStorage.setItem('proposedExchange', props.id);
+  emit('propose-exchange');
+  router.push('/propose-exchange');
+};
 </script>
